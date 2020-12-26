@@ -349,6 +349,8 @@ function main() {
                             images.save(img, currentFilePath, imgType);
                             lastPage = 1;
                         }
+                        var currentFilePath = dirName + "/" + "OCR失败"+lastPage+"." + imgType;
+                        images.save(img, currentFilePath, imgType);
                     }
                     //ocr并发太快，出现错误
                     while (result.error_code == 18) {
