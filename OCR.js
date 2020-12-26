@@ -58,6 +58,14 @@ ui.layout(
                 </card> */}
                 <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
                 cardElevation="1dp" gravity="center_vertical">
+                    <ScrollView>
+                    <vertical padding="18 8" h="auto">
+                        <text id="当前时间" text="当前时间是：" gravity="center" textColor="#222222"/>
+                    </vertical>
+                    </ScrollView>
+                </card>
+                <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                cardElevation="1dp" gravity="center_vertical">
                 <ScrollView>
                     <vertical padding="18 8" h="auto">
                         <text text="下载功能选择：" textColor="#222222"/>
@@ -77,6 +85,7 @@ ui.layout(
                             <radio  id="no_subscribe" text="否"  >
                             </radio>
                         </radiogroup>
+                        <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/>
                         
                     </vertical>
                 </ScrollView>
@@ -171,10 +180,18 @@ ui.stop.on("click", function() {
     toast("已终止执行脚本");
 });
 
+threads.start(function() {
+    ui.数据保存路径.setText("当前数据保存路径"+dirName);
+    while(1){
+        var currentDate = new Date();
+        ui.当前时间.setText("当前时间为:"+currentDate);
+        toastLog(currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate());
+        sleep(60000);
+    }
+});
 
-
-
-var dirName = "/storage/emulated/0/电子书/";
+var currentDate = new Date();
+var dirName = "/storage/emulated/0/电子书/"+currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate()+"/";
 var imgType = "jpg";
 var currentPage = 0; //当前需要保存的页数
 var lastPage = 0; //上次保存的页数
