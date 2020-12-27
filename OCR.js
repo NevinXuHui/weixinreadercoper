@@ -350,8 +350,8 @@ function main() {
                     //lastPage = 5
                     log("上一页的页码："+ lastPage.toString());
                     //log("当前页显示的页码："+ tempcurrentPage.toString());
-                    var currentFilePath = dirName + "/" + "OCR"+lastPage.toString()+"." + imgType;
-                    images.save(clip, currentFilePath, imgType);
+                  //  var currentFilePath = dirName + "/" + "OCR"+lastPage.toString()+"." + imgType;
+                  //  images.save(clip, currentFilePath, imgType);
 
                     var result = BaiDu_ocr(tokenRes, clip, false);
                     //显示当前ocr获取信息
@@ -411,10 +411,8 @@ function main() {
                     retryFlagNum = 0;
                 }
 
-                if(tempValue == 0){
-                    下一页();
-                    sleep(800);
-                }else if(tempValue == 1){
+
+                if(tempValue == 1){
                     retryFlagNum = 0;
                     //定义当前图片名称
                     var displaycurrentPage = currentPage;
@@ -424,12 +422,12 @@ function main() {
                     lastPage = currentPage;
                 }else { //当前文件与上一个文件不连续
                     errorPageNum = errorPageNum + 1;
-                    log("error lastPage:" + lastPage.toString());
-                    log("retryFlagNum:" + retryFlagNum.toString());
-                    currentFilePath = dirName + "/" + lastPage.toString() + "错误" + errorPageNum.toString() + "." + imgType;
+                    // log("error lastPage:" + lastPage.toString());
+                    // log("retryFlagNum:" + retryFlagNum.toString());
+                    currentFilePath = dirName + "/" + lastPage.toString() + "错误" + errorPageNum + "." + imgType;
                     //重复操作三次
                     if (retryFlagNum < 2) {
-                        向右翻页();
+                       // 向右翻页();
                        // VolumeUp();
                         retryFlagNum = retryFlagNum + 1;
                     } else {
