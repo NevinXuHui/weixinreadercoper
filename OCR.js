@@ -185,7 +185,7 @@ threads.start(function() {
     while(1){
         var currentDate = new Date();
         ui.当前时间.setText("当前时间为:"+currentDate);
-        toastLog(currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate());
+       // toastLog(currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate());
         sleep(60000);
     }
 });
@@ -259,7 +259,7 @@ function main() {
         auto.waitFor();
 
         //启用按键监听
-        events.observeKey();
+        //events.observeKey();
 
         device.wakeUp();
 
@@ -310,6 +310,7 @@ function main() {
             向右翻页();
             restoreFlag = 1;
         }
+       // sleep(1000);
         // while(1){
         //     向左翻页();
         //     sleep(500);
@@ -329,12 +330,29 @@ function main() {
             try {
                 //ocr获取页码及翻页    
                 do {
-
+                    log("开始截图ocr");
                     var img = captureScreen();
-                    click(width - 30, height / 2); //翻页
-                    log("翻一页");
-                    var clip = images.clip(img, width - 500, height - 100, 500, 90);
+                    sleep(20);
+                    下一页(); //翻页
+                    log("已截图，向下翻一页")
+                    // VolumeDown();
+                    // if(firstPageFlag == 1){
+                    //     sleep(50);
+                    //     VolumeDown();
+
+                    // }
+                    //while(1);
+
+                    //var clip = images.clip(img, width*4/5, height*59/60, width/5, height/60);
+                    var clip = images.clip(img, width - 350, height - 95, 350, 75);
                     sleep(10);
+
+                    //lastPage = 5
+                    log("上一页的页码："+ lastPage.toString());
+                    //log("当前页显示的页码："+ tempcurrentPage.toString());
+                    var currentFilePath = dirName + "/" + "OCR"+lastPage.toString()+"." + imgType;
+                    images.save(clip, currentFilePath, imgType);
+
                     var result = BaiDu_ocr(tokenRes, clip, false);
                     //显示当前ocr获取信息
                     log(result);
@@ -348,18 +366,31 @@ function main() {
                             var currentFilePath = dirName + "/" + "1." + imgType;
                             images.save(img, currentFilePath, imgType);
                             lastPage = 1;
+                            var currentFilePath = dirName + "/" + "OCR失败0"+"." + imgType;
+                            // VolumeDown();
+                            // sleep(1000);
+
+                        }else{
+                            var currentFilePath = dirName + "/" + "OCR失败"+lastPage.toString()+"." + imgType;
+                            //退回上一页重新截图OCR
+                            log("截图失败，返回上一页重新截图");
+                            向右翻页();
+                            //VolumeUp();
+                            sleep(1500);
                         }
-                        var currentFilePath = dirName + "/" + "OCR失败"+lastPage+"." + imgType;
                         images.save(clip, currentFilePath, imgType);
+                        log("OCR失败一次");
                     }
                     //ocr并发太快，出现错误
                     while (result.error_code == 18) {
                         var result = BaiDu_ocr(tokenRes, clip, false);
-                        sleep(1000);
+                        log(result);
+                        sleep(500);
                     }
                     while (result.error_code == 282000) {
                         var result = BaiDu_ocr(tokenRes, clip, false);
-                        sleep(1000);
+                        log(result);
+                        sleep(500);
                     }
 
                 }
@@ -369,37 +400,43 @@ function main() {
                 var integralContent = result.words_result[0].words.split('/');
                 currentPage = integralContent[0];
                 totalPage = integralContent[1];
-                log("当前页数：" + integralContent[0] + "      " + "总页数：" + integralContent[1]);
+                log("当前页数：" + integralContent[0].toString() + "      " + "总页数：" + integralContent[1].toString());
                 var currentFilePath = "";
                 var tempValue = currentPage - lastPage;
-                log("tempValue:" + tempValue);
+                log("前一个ocr值与当前值的差值:" + tempValue.toString());
 
                 if (restoreFlag == 1) {
                     tempValue = 1;
                     restoreFlag = 0;
                     retryFlagNum = 0;
                 }
-                if (tempValue != 1) { //当前文件与上一个文件不连续
+
+                if(tempValue == 0){
+                    下一页();
+                    sleep(800);
+                }else if(tempValue == 1){
+                    retryFlagNum = 0;
+                    //定义当前图片名称
+                    var displaycurrentPage = currentPage;
+                    currentFilePath = dirName + "/" + displaycurrentPage.toString() + "." + imgType;
+                    //保存当前页数
+                    log("页码连续 当前保存页:" + currentPage.toString());
+                    lastPage = currentPage;
+                }else { //当前文件与上一个文件不连续
                     errorPageNum = errorPageNum + 1;
-                    log("error lastPage:" + lastPage);
-                    log("retryFlagNum:" + retryFlagNum);
-                    currentFilePath = dirName + "/" + lastPage + "错误" + errorPageNum + "." + imgType;
+                    log("error lastPage:" + lastPage.toString());
+                    log("retryFlagNum:" + retryFlagNum.toString());
+                    currentFilePath = dirName + "/" + lastPage.toString() + "错误" + errorPageNum.toString() + "." + imgType;
                     //重复操作三次
-                    if (retryFlagNum < 3) {
+                    if (retryFlagNum < 2) {
                         向右翻页();
+                       // VolumeUp();
                         retryFlagNum = retryFlagNum + 1;
                     } else {
                         //跳过无法解析的页
                         restoreFlag = 1;
                     }
-                } else {
-                    retryFlagNum = 0;
-                    //定义当前图片名称
-                    currentFilePath = dirName + "/" + currentPage + "." + imgType;
-                    //保存当前页数
-                    log("right lastPage:" + lastPage);
-                    lastPage = currentPage;
-                }
+                } 
                 images.save(img, currentFilePath, imgType);
 
                 //手动跳出微信读书页面
@@ -436,7 +473,7 @@ function main() {
 
 
             } catch (error) {
-              //  toastLog(error);
+                toastLog(error);
                 
                 toastLog("出现异常,请关闭应用重新执行脚本！");
                 exit(); // 有异常退出，结束脚本
@@ -465,7 +502,7 @@ function ReturnFirstPage() {
         }
         sleep(100);
     }
-    log("继续1");
+   // log("继续1");
     //目录按钮按下
     ret.click();
     ret = className("androidx.recyclerview.widget.RecyclerView").findOnce();
@@ -484,7 +521,7 @@ function ReturnFirstPage() {
     className("android.widget.TextView").text("扉页").findOnce().parent().click();
     log("进入扉页");
     //创建目录
-    log(dirName);
+   // log(dirName);
     if (files.createWithDirs(dirName + "/")) {
         log("创建目录成功");
     } else {
@@ -661,6 +698,10 @@ function 向左翻页() {
 function 向右翻页() {
     gesture(100, [width / 4, height / 2], [width / 2, height / 2]);
     sleep(500);
+}
+
+function 下一页(){
+    click(width - 30, height / 2); //翻页
 }
 
 //main();
