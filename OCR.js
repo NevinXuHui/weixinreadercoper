@@ -310,6 +310,13 @@ function main() {
             向右翻页();
             restoreFlag = 1;
         }
+            //创建目录
+   // log(dirName);
+    if (files.createWithDirs(dirName + "/")) {
+        log("创建目录成功");
+    } else {
+        log("文件夹已存在");
+    }
        // sleep(1000);
         // while(1){
         //     向左翻页();
@@ -518,13 +525,7 @@ function ReturnFirstPage() {
     }
     className("android.widget.TextView").text("扉页").findOnce().parent().click();
     log("进入扉页");
-    //创建目录
-   // log(dirName);
-    if (files.createWithDirs(dirName + "/")) {
-        log("创建目录成功");
-    } else {
-        log("文件夹已存在");
-    }
+
 }
 
 
