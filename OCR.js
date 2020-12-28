@@ -267,7 +267,7 @@ function main() {
         while (!launchApp(launchAppName)) {
             num = num + 1;
             if ((num % 30) == 0) {
-                toastLog("打开微信");
+           //     toastLog("打开微信");
             }
             sleep(100);
         }
@@ -292,13 +292,27 @@ function main() {
             sleep(100);
 
         }
-        className("android.widget.TextView").text("书架").depth("12").findOnce().parent().click();
-        log("0");
+        // while(1){
+        var isclick = id("rw").findOnce(0).click();
+        log(isclick);
+        sleep(500);
+        // }
+        // var target = className("android.widget.TextView").text("书架").depth(2).findOne();
+        // while(1){
+        //     var isclick = target.parent().click();
+        //     sleep(1000);
+        //     log(isclick);
+        //     log("按一下");
+        // }
+        
+        // log("0");
+        // while(1);
         var target = className("android.widget.TextView").id("ho").findOnce();
-        log("1");
+   //     log("1");
         dirName = dirName + target.text();
-
-        toastLog(dirName);
+   //     log(dirName);
+//while(1);
+     //   toastLog(dirName);
         target.parent().click();
 
         // while (1);
@@ -406,8 +420,15 @@ function main() {
                 //获取当前页数及总页数
                 var integralContent = result.words_result[0].words.split('/');
                 currentPage = integralContent[0];
+                log(integralContent.length);
+
+                if(integralContent.length >=2)
+                {
                 totalPage = integralContent[1];
-                log("当前页数：" + integralContent[0].toString() + "      " + "总页数：" + integralContent[1].toString());
+                }else{
+                    totalPage = 9999;
+                }
+                log("当前页数：" + currentPage + "      " + "总页数：" + totalPage);
                 var currentFilePath = "";
                 var tempValue = currentPage - lastPage;
                 log("前一个ocr值与当前值的差值:" + tempValue.toString());
@@ -531,7 +552,7 @@ function ReturnFirstPage() {
 
 function StoreTable(dir) {
     var currentDirContent = dir + "/目录.txt";
-    toastLog("test5");
+//    toastLog("test5");
     var num = 0;
     files.createWithDirs(currentDirContent);
     var 目录文件 = open(currentDirContent, "w");
@@ -546,7 +567,7 @@ function StoreTable(dir) {
         sleep(100);
     }
     ret.click();
-toastLog("test6");
+//toastLog("test6");
 
     while (!className("android.widget.TextView").text("扉页").exists()) {
         
