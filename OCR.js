@@ -6,6 +6,7 @@ var form = {
     value书籍总页数: 9999,
     value书籍数量: 1,
     value第几本: 1,
+    is截图完成删除书架:1,
 
 }
 ui.layout(
@@ -30,32 +31,6 @@ ui.layout(
                             </ScrollView>
                             <View bg="#4caf50" h="*" w="10"/>
                         </card>
-                        {/* <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-                        cardElevation="1dp" gravity="center_vertical">
-                        <ScrollView>
-                            <vertical padding="18 8" h="auto">
-                                <text text="目录下载" textColor="#222222"/>
-                                <radiogroup columns="2">
-                                    <radio id="yes_subscribe"  text="是" marginTop="5">
-                                    </radio>
-                                    <radio  id="no_subscribe" text="否" checked = "true" >
-                                    </radio>
-                                </radiogroup>
-                            </vertical>
-                        </ScrollView>
-                        <View bg="#2196f3" h="*" w="10"/>
-                    </card>
-                    <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
-                    cardElevation="1dp" gravity="center_vertical">
-                    <ScrollView>
-                        <vertical padding="18 8" h="auto">
-                            <text text="内容下载：" textColor="#222222"/>
-                            <checkbox id="yes_read" text="文章学习时长任务(预计花费12分钟)" />
-                            <checkbox id="yes_watch" text="视听学习时长任务(建议在wifi环境下执行，预计花费18分钟)" marginTop="5"/>
-                        </vertical>
-                    </ScrollView>
-                    <View bg="#2196f3" h="*" w="10"/>
-                </card> */}
                 <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
                 cardElevation="1dp" gravity="center_vertical">
                     <ScrollView>
@@ -78,13 +53,12 @@ ui.layout(
                         <input id="第几本开始" text="1" inputType="number"/>
                         <text textSize="16sp" textColor="black" text="需要下载的书籍数量"/>
                         <input id="书籍下载数量" text="1" inputType="number"/>
-                        <text textSize="16sp" textColor="black" text="每本是否进行从头开始截图"/>
-                        <radiogroup columns="2">
-                            <radio id="yes_subscribe"  text="是" checked = "true" marginTop="5">
-                            </radio>
-                            <radio  id="no_subscribe" text="否"  >
-                            </radio>
-                        </radiogroup>
+                        <text textSize="16sp" textColor="black" text="第一本是否进行从头开始截图"/>
+                        <checkbox id="内容从头开始截图按钮" text="是" checked = "true" marginTop="5"/>
+                        
+                        <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
+                        <checkbox id="删除书籍按钮" text="是" checked = "true" marginTop="5"/>
+                        
                         <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/>
                         
                     </vertical>
@@ -128,17 +102,17 @@ ui.内容按钮.on("check", function(check) {
     else
         form.is内容 = false;
 });
-ui.yes_subscribe.on("check", function(check) {
+ui.内容从头开始截图按钮.on("check", function(check) {
     if (check)
         form.is从头开始截图 = true;
     else
         form.is从头开始截图 = false;
 });
-ui.no_subscribe.on("check", function(check) {
+ui.删除书籍按钮.on("check", function(check) {
     if (check)
-        form.is从头开始截图 = false;
+        form.is截图完成删除书架 = true;
     else
-        form.is从头开始截图 = true;
+        form.is截图完成删除书架 = false;
 });
 
 
@@ -180,18 +154,10 @@ ui.stop.on("click", function() {
     toast("已终止执行脚本");
 });
 
-threads.start(function() {
-    ui.数据保存路径.setText("当前数据保存路径"+dirName);
-    while(1){
-        var currentDate = new Date();
-        ui.当前时间.setText("当前时间为:"+currentDate);
-       // toastLog(currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate());
-        sleep(60000);
-    }
-});
 
 var currentDate = new Date();
-var dirName = "/storage/emulated/0/电子书/"+currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate()+"/";
+var realMonth = currentDate.getMonth()+1;
+var dirName = "/storage/emulated/0/电子书/"+currentDate.getFullYear()+"-"+realMonth+"-"+currentDate.getDate()+"/";
 var imgType = "jpg";
 var currentPage = 0; //当前需要保存的页数
 var lastPage = 0; //上次保存的页数
@@ -204,6 +170,15 @@ var launchAppName = "微信读书";
 var firstPageFlag = 0;
 var ocrFailTime = 0;
 
+threads.start(function() {
+    while(1){
+        ui.数据保存路径.setText("当前数据保存路径"+dirName);
+        var currentDate = new Date();
+        ui.当前时间.setText("当前时间为:"+currentDate);
+       // toastLog(currentDate.getFullYear()+"-"+currentDate.getMonth()+"-"+currentDate.getDate());
+        sleep(60000);
+    }
+});
 
 //监听音量上键按下
 events.onKeyDown("volume_up", function(event) {
@@ -219,14 +194,17 @@ function 删除第一本书(){
     var target = className("android.widget.TextView").id("ho").findOnce();
     dirName = dirName + target.text();
     target.parent().longClick();
+    sleep(200);
     //点击移出按钮
     target = className("android.widget.TextView").text("移出书架").findOne();
     target.parent().click();
+    sleep(300);
 
     //再次确认
     className("androidx.recyclerview.widget.RecyclerView").findOne().children().forEach(child => {
         var target = child.findOne(className("android.widget.TextView"));
         target.parent().click();
+        sleep(300);
         });
 
 }
@@ -266,6 +244,7 @@ function 返回书架页面(){
     }
     var isclick = id("rw").findOnce(0).click();
     log("书架页面点击成功状态："+isclick);
+    //停顿防止按键按到其他界面
     sleep(500);
 }
 
@@ -318,10 +297,6 @@ function main() {
         //启用按键监听
         //events.observeKey();
 
-        //点亮屏幕
-        device.wakeUp();
-
-
         while (!launchApp(launchAppName)) {
             num = num + 1;
             if ((num % 30) == 0) {
@@ -350,7 +325,7 @@ function main() {
             restoreFlag = 1;
         }
 
-    //创建目录
+    //创建书籍目录
     if (files.createWithDirs(dirName + "/")) {
         log("创建目录成功");
     } else {
@@ -365,9 +340,7 @@ function main() {
                 do {
                     log("开始截图ocr");
                     var img = captureScreen();
-                    sleep(20);
-                  //  while(1);
-                    
+                    sleep(20);                  
                     下一页(); //翻页
                     log("已截图，向下翻一页")
                     var clip = images.clip(img, width - 350, height - 95, 350, 75);
@@ -381,10 +354,6 @@ function main() {
                     else{
                         log("中断后重新开始状态，或者第一页开始扫描，无上一页数据");
                     }
-
-                    //log("当前页显示的页码："+ tempcurrentPage.toString());
-                  //  var currentFilePath = dirName + "/" + "OCR"+lastPage.toString()+"." + imgType;
-                  //  images.save(clip, currentFilePath, imgType);
 
                     var result = BaiDu_ocr(tokenRes, clip, false);
                     //显示当前ocr获取信息
@@ -418,24 +387,20 @@ function main() {
                                 ocrFailTime = 0;
                                 var currentPage = lastPage+1;
                                 var currentFilePath = dirName + "/" + currentPage+"." + imgType;
-                                images.save(clip, currentFilePath, imgType);
+                                images.save(img, currentFilePath, imgType);
                                 lastPage = lastPage+1;
                             }else{
                                 向右翻页();
                             }
-                            sleep(1500);
+                            sleep(800);
                         }
                         
                        // images.save(clip, currentFilePath, imgType);
                         log("OCR失败一次");
                     }
                     //ocr并发太快，出现错误
-                    while (result.error_code == 18) {
-                        var result = BaiDu_ocr(tokenRes, clip, false);
-                        log(result);
-                        sleep(500);
-                    }
-                    while (result.error_code == 282000) {
+
+                    while (result.error_code>0 && result.error_code<9999999) {
                         var result = BaiDu_ocr(tokenRes, clip, false);
                         log(result);
                         sleep(500);
@@ -445,7 +410,8 @@ function main() {
                 }
                 while (result.words_result_num == 0);
 
-                //获取当前页数及总页数
+                ocrFailTime = 0;
+                //获取当前页数及总页数   
                 var integralContent = result.words_result[0].words.split('/');
                 currentPage = integralContent[0];
                 log(integralContent.length);
@@ -518,22 +484,21 @@ function main() {
                     }
                     向右翻页(); //返回上一页
                     if(form.is目录){
-                    StoreTable(dirName);
-                    toastLog("目录保存完成");
+                        StoreTable(dirName);
+                        toastLog("目录保存完成");
+                    
+                        if(form.is截图完成删除书架 == 1){
+                            删除第一本书();
+                        }
                     }
 
                     toastLog("全部完成，退出微信读书！");
                     关闭微信进程();
-                    //sleep(500);
-                    //threads.shutDownAll();
-                    //while(1);
-                    //exit(); // 结束脚本
                 }
 
 
             } catch (error) {
                 toastLog(error);
-                
                 toastLog("出现异常,请关闭应用重新执行脚本！");
                 exit(); // 有异常退出，结束脚本
             }
@@ -542,9 +507,6 @@ function main() {
     exit();
     });
 }
-
-
-
 
 function ReturnFirstPage() {
     var num = 0;
@@ -579,11 +541,11 @@ function ReturnFirstPage() {
 
 }
 
-
 function StoreTable(dir) {
     var currentDirContent = dir + "/目录.txt";
 //    toastLog("test5");
     var num = 0;
+    //创建目录文件
     files.createWithDirs(currentDirContent);
     var 目录文件 = open(currentDirContent, "w");
     var ret = className("android.widget.ImageView").id("yn").desc("目录").findOnce();
@@ -597,7 +559,6 @@ function StoreTable(dir) {
         sleep(100);
     }
     ret.click();
-//toastLog("test6");
 
     while (!className("android.widget.TextView").text("扉页").exists()) {
         
@@ -612,7 +573,7 @@ function StoreTable(dir) {
         while (!ret) {
             ret = className("androidx.recyclerview.widget.RecyclerView").findOnce();
             toastLog("正在寻找目录内容框架");
-            sleep(3000);
+            sleep(1000);
         }
         var pageDataList = [];
         var allPageDataList = [];
@@ -631,9 +592,6 @@ function StoreTable(dir) {
             //当前某一行与上一个列表中的任何项比较
             lastPageDataList.forEach(function(item, index) {
                 if (lastPageDataList[index][1] == dataList[1]) {
-                    //  log("lastPageDataList:"+lastPageDataList);
-                    // log("发现重复目录");
-                    // //  log("index"+index);
                     log("dataList:" + dataList);
                     目录重复标志 = 1;
                 } else {
@@ -641,10 +599,6 @@ function StoreTable(dir) {
                     log("lastPageDataList:" + lastPageDataList);
                     log("dataList:" + dataList);
                 }
-                //  log("index:"+index);
-                //  log("item:"+item);
-                //  log("lastPageDataList[index][1]:"+lastPageDataList[index][1]);
-                //  log("dataList[1]:"+dataList[1]);
             });
             //无重复的写入当前列表中
             if (目录重复标志 == 0) {
@@ -654,16 +608,11 @@ function StoreTable(dir) {
             allPageDataList.push(dataList);
             // log("dataList[1]:"+dataList[1]);
         });
-        // log("lastPageDataList[0]:"+lastPageDataList[0]);
-        // log("pageDataList[0]:"+pageDataList[0]);
-        // if(lastPageDataList[0][1] == pageDataList[0][1]){
-        //     目录文件.close();
-        //     break;
-        // }
         log("pageDataList.length:" + pageDataList.length);
         if (pageDataList.length == 0) {
             log("目录重复了");
             目录文件.close();
+            back();
             break;
         }
         //更新当前最新目录到上一次的目录
