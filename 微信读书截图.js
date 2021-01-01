@@ -217,7 +217,7 @@ function 书架界面选择全部离线下载(){
     sleep(300);
 
     //再次确认
-    target = className("android.widget.TextView").id("atm").text("下载到本地").findOne(); 
+    target = className("android.widget.TextView").id("atm").text("下载到本地").findOne(1000); 
     target.parent().click();
     sleep(2000);
 }
@@ -535,6 +535,7 @@ function 完整截图首本书(tokenRes){
                 
             } 
             images.save(img, currentFilePath, imgType);
+            sleep(50);
 
             //手动跳出微信读书页面
             if (appPackageName != currentPackage()) {
@@ -713,7 +714,7 @@ function StoreTable(dir) {
             //当前某一行与上一个列表中的任何项比较
             lastPageDataList.forEach(function(item, index) {
                 if (lastPageDataList[index][1] == dataList[1]) {
-                    log("dataList:" + dataList);
+                    log("当前数据重复     "+"dataList:" + dataList);
                     目录重复标志 = 1;
                 } else {
                     log("未发现重复目录");
@@ -723,8 +724,9 @@ function StoreTable(dir) {
             });
             //无重复的写入当前列表中
             if (目录重复标志 == 0) {
-                log("dataList的值：" + dataList);
+                log("目标未重复    当前存入的dataList的值：" + dataList);
                 pageDataList.push(dataList);
+                log("pageDataList:"+pageDataList);
             }
             allPageDataList.push(dataList);
             // log("dataList[1]:"+dataList[1]);
