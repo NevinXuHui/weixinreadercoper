@@ -218,8 +218,14 @@ function 书架界面选择全部离线下载(){
 
     //再次确认
     target = className("android.widget.TextView").id("atm").text("下载到本地").findOne(1000); 
+
     target.parent().click();
-    sleep(2000);
+    sleep(1000);
+    if(id("ja").exists()){
+        back();
+    }
+    sleep(1000);
+
 }
 
 function 删除第一本书(){
@@ -259,10 +265,10 @@ function 寻找当前书架书籍及离线预下载(num){
     var 书籍数量Temp = num;
    // 返回书架页面();
     书架界面选择全部离线下载();
-
+    log("1");
 
     while(!书籍搜索完成flag){
-        var ret = className("androidx.recyclerview.widget.RecyclerView").scrollable(true).findOne();
+        var ret = className("androidx.recyclerview.widget.RecyclerView").depth(17).findOne();
         try{
             ret.children().forEach(child => {
                 log(child);
