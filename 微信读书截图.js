@@ -6,7 +6,7 @@ var form = {
     value书籍截图总页数: 2,
     value书籍截图数量: 1,
     value第几本开始截图: 1,
-    is截图完成删除书架:1,
+    is截图完成删除书架:0,
     is书籍离线预下载:0,
     value书籍离线下载数量:10,
 
@@ -55,12 +55,12 @@ ui.layout(
                         <text textSize="16sp" textColor="black" text="选择第几本开始进行截图"/>
                         <input id="第几本开始截图" text="1" inputType="number"/>
                         <text textSize="16sp" textColor="black" text="需要截图的书籍数量"/>
-                        <input id="书籍截图数量" text="2" inputType="number"/>
+                        <input id="书籍截图数量" text="1" inputType="number"/>
                         <text textSize="16sp" textColor="black" text="第一本是否进行从头开始截图"/>
                         <checkbox id="内容从头开始截图按钮" text="是" checked = "true" marginTop="5"/>
                         
                         <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
-                        <checkbox id="删除书籍按钮" text="是" checked = "true" marginTop="5"/>
+                        <checkbox id="删除书籍按钮" text="是" checked = "false" marginTop="5"/>
 
                         <text textSize="16sp" textColor="black" text="书籍离线预下载"/>
                         <checkbox id="书籍离线预下载按钮" text="是" checked = "false" marginTop="5"/>
@@ -621,12 +621,16 @@ function main() {
             sleep(100);
         }
 
-        寻找当前书架书籍及离线预下载(form.value书籍截图数量);
-        if(!form.is书籍离线预下载){
-            while(form.value书籍截图数量 != 0){
-                form.value书籍截图数量--;
-                log("form.value书籍截图数量:"+form.value书籍截图数量);
-                完整截图首本书(baiduocrtokenRes);
+        
+        if(form.is书籍离线预下载){
+            寻找当前书架书籍及离线预下载(form.value书籍截图数量);
+        }
+        while(form.value书籍截图数量 != 0){
+            form.value书籍截图数量--;
+            log("form.value书籍截图数量:"+form.value书籍截图数量);
+            完整截图首本书(baiduocrtokenRes);
+            if(!form.is截图完成删除书架){
+                form.value书籍截图数量 = 0; 
             }
         }
 
@@ -704,8 +708,8 @@ function StoreTable(dir) {
             sleep(1000);
         }
         log("获取到目录框架");
-        var pageDataList = [];
-        var allPageDataList = [];
+        let pageDataList = [];
+        let allPageDataList = [];
         log("初始pageDataList长度:" + pageDataList.length);
         var 终极重复标志 = 0;
         //获取一页目录内容
@@ -746,6 +750,7 @@ function StoreTable(dir) {
             break;
         }
         //更新当前最新目录到上一次的目录
+        lastPageDataList = [];
         lastPageDataList = allPageDataList;
         //   log(pageDataList);
         pageDataList.forEach(function(item, index) {
