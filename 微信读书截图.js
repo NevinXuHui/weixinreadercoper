@@ -605,7 +605,7 @@ function main() {
         //启用按键监听
         //events.observeKey();
 
-        while (!launchApp(launchAppName)) {
+        while (!launch(appPackageName)) {
             num = num + 1;
             if ((num % 30) == 0) {
                 log("打开微信");
@@ -703,6 +703,7 @@ function StoreTable(dir) {
             toastLog("正在寻找目录内容框架");
             sleep(1000);
         }
+        log("获取到目录框架");
         var pageDataList = [];
         var allPageDataList = [];
         log("初始pageDataList长度:" + pageDataList.length);
