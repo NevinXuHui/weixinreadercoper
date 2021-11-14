@@ -430,12 +430,14 @@ function 完整截图首本书(tokenRes){
                 var result = BaiDu_ocr(tokenRes, clip, false);
                 //显示当前ocr获取信息
                 log(result);
+                
                 sleep(10);
 
                 if (result.words_result_num == 0) {
                     //第一页扉页 无页面  特殊处理
                     if (firstPageFlag == 1) {
                         log("保存扉页");
+                        while(1);
                         firstPageFlag = 0;
                         var currentFilePath = openBookPathName  + "1." + imgType;
                         images.save(img, currentFilePath, imgType);
@@ -591,6 +593,7 @@ function main() {
 
         //获取百度ocr的token码
         var baiduocrtokenRes = Get_token_Res();
+        log("baiduocrtokenRes:"+baiduocrtokenRes)
 
         var num = 0;
 
