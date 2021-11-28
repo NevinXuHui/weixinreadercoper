@@ -1,6 +1,7 @@
 "ui";
 importClass(android.widget.AdapterView);
 importClass(android.widget.SeekBar);
+importClass(java.io.File);
 
 var 测试列表Value = null
 var 图片压缩比Value = null;
@@ -111,10 +112,11 @@ ui.autoService.on("check", function(checked) {
 });
 
 ui.stop.on("click",()=>{
-    threads.shutDownAll();
-    engines.stopAll();
-    exit();
-    toast("已终止执行脚本");
+    var choiceFile =dialogFile.thelist("/sdcard")
+    log(choiceFile+"choiceFile")
+    // threads.shutDownAll();
+    // engines.stopAll();
+    // exit();
 });
 
 ui.start.on("click",()=>{
@@ -240,4 +242,5 @@ toastLog('Hello, Auto.js ' + $app.autojs.versionName);
 var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
 var jsonUtil = require('jsonUtil.js');
+var dialogFile = require('dialogFile.js');
 console.log("baiduocr token:", baiduOCR.Get_token_Res());
