@@ -112,11 +112,11 @@ ui.autoService.on("check", function(checked) {
 });
 
 ui.stop.on("click",()=>{
-    var choiceFile =dialogFile.thelist("/sdcard")
-    log(choiceFile+"choiceFile")
-    // threads.shutDownAll();
-    // engines.stopAll();
-    // exit();
+    // var choiceFile =dialogFile.thelist("/sdcard")
+    // log(choiceFile+"choiceFile")
+    threads.shutDownAll();
+    engines.stopAll();
+    exit();
 });
 
 ui.start.on("click",()=>{

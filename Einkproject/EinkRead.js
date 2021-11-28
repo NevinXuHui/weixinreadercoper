@@ -13,7 +13,7 @@ EinkRead.向后翻页 = function() {
 
 
 EinkRead.获取目录 = function(dirName,flag){
-  var currentDirContent = dirName + "目录.txt";
+  var currentDirContent = dirName + "目录";
   //创建目录文件
   files.createWithDirs(currentDirContent);
   var 目录文件 = open(currentDirContent, "w");
@@ -239,7 +239,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                   //最后一页
                   if(integralContent[0] == integralContent[1] ){
                       if(currentPage == integralContent[0]){
-                          获取目录(dirName,1)
+                        EinkRead.获取目录(dirName,1)
                       }
                   }
 
