@@ -45,6 +45,7 @@ ui.layout(
                     <vertical padding="18 8" h="auto">
                         <spinner id="测试列表" entries="{{entries}}"/>
                         <seekbar id="图片压缩比"/>
+                        <text text="当前图片压缩比20%" id="当前图片压缩比显示值" textColor="#222222"/>
                         <text text="下载功能选择：" textColor="#222222"/>
                         <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
                         <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/>
@@ -92,6 +93,46 @@ ui.layout(
     </drawer>
 )
 
+//设置滑动页面的标题
+ui.viewpager.setTitles(["任务列表", "其他"]);
+//让滑动页面和标签栏联动
+ui.tabs.setupWithViewPager(ui.viewpager);
+
+ui.autoService.on("check", function(checked) {
+    // 用户勾选无障碍服务的选项时，跳转到页面让用户去开启
+    if (checked && auto.service == null) {
+        app.startActivity({
+            action: "android.settings.ACCESSIBILITY_SETTINGS"
+        });
+    }
+    if (!checked && auto.service != null) {
+        auto.service.disableSelf();
+    }
+});
+
+ui.stop.on("click",()=>{
+    threads.shutDownAll();
+    engines.stopAll();
+    exit();
+    toast("已终止执行脚本");
+});
+
+ui.start.on("click",()=>{
+        //程序开始运行之前判断无障碍服务
+    if (auto.service == null) {
+        toastLog("请先开启无障碍服务！");
+        return;
+    }
+    // form.value书籍截图总页数 = parseInt(ui.书籍截图总页数.getText());
+    // form.value书籍截图数量 = parseInt(ui.书籍截图数量.getText());
+    // form.value第几本开始截图 = parseInt(ui.第几本开始截图.getText());
+  //  form.value书籍离线下载数量 = parseInt(ui.离线下载书籍数量.getText());
+  threads.start(function() {
+    main()
+  })
+
+});
+
 //BindSdcard-Init&Save
 var uiStorage = storages.create("STORAGE_UI_VALUE_789185");
 ui.emitter.on("resume",()=>{
@@ -100,13 +141,24 @@ ui.emitter.on("resume",()=>{
 ui.emitter.on("pause",()=>{
     saveUiValue();
 });
+
 initUiValue();
+
 function initUiValue(){
     ui.图片压缩比.setProgress(uiStorage.get("图片压缩比",0));
     ui.测试列表.setSelection(uiStorage.get("测试列表",0));
     ui.内容从头开始截图按钮.setChecked(uiStorage.get("内容从头开始截图按钮",false));
     ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
     ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
+
+    内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
+    获取内容按钮Value = ui.获取内容按钮.checked;
+    获取目录按钮Value = ui.获取目录按钮.checked;
+    测试列表Value = ui.测试列表.getSelectedItem();
+    图片压缩比Value = ui.图片压缩比.getProgress();
+
+    ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
+
 }
 function saveUiValue(){
     uiStorage.put("图片压缩比",ui.图片压缩比.getProgress());
@@ -114,11 +166,13 @@ function saveUiValue(){
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
+    
 }
 
 ui.内容从头开始截图按钮.on("check",(checked)=>{
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
+
 });
 //Bind-Connect 获取内容按钮
 ui.获取内容按钮.on("check",(checked)=>{
@@ -140,40 +194,50 @@ ui.测试列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener
 ui.图片压缩比.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
     图片压缩比Value = ui.图片压缩比.getProgress();
     toastLog("比例改变："+图片压缩比Value)
+    ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
 }}));
+
+function main(){
+
+    if(内容从头开始截图按钮Value == true){
+        var currentPage = 1
+    }else{
+        var currentPage = 0
+    }
+
+    log("currentPage:"+currentPage);
+    device.keepScreenOn()
+
+    EinkRead.删除全部其他脚本()
+
+    EinkRead.打开微信读书()
+
+    EinkRead.进入书架界面()
+
+    var 当前书籍名 = EinkRead.打开书籍()
+
+    EinkRead.跳转到首页(currentPage)
+
+    var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
+
+    EinkRead.打开截图权限()
+
+    var tokenRes= baiduOCR.Get_token_Res()
+
+    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value)
+    toastLog("截图完成退出")
+    device.cancelKeepingAwake()
+
+}
 
 
 toastLog('Hello, Auto.js ' + $app.autojs.versionName);
 
-function readJSON(fileName){
-    if(typeof fileName == "string"){
-        var strList = fileName.split(".");
-        if(strList[strList.length-1].toLowerCase() == "json"){
-            var data = files.read(fileName);
-            return JSON.parse(data);
-        }else{
-            throw Error("not JSON File")
-        }
-    }else{
-        throw Error("not file name")
-    }
-}
-function writeJSON(fileName,data){
-    if(typeof fileName == "string"){
-        try{
-            files.write(fileName,JSON.stringify(data))
-        }catch(e){
-            console.log("Hava Error!!!")
-        }
-    }
-}
-
-var jsonData = readJSON("project.json")
-writeJSON("data.json",jsonData)
-log("jsonData.name:"+jsonData.name)
+// var jsonData = readJSON("project.json")
+// writeJSON("data.json",jsonData)
+// log("jsonData.name:"+jsonData.name)
 
 var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
-console.log("半径为 4 的圆的面积是 %d", EinkRead.area(4));
-console.log("半径为 4 的圆的面积是 %d", baiduOCR.Get_token_Res);
-
+var jsonUtil = require('jsonUtil.js');
+console.log("baiduocr token:", baiduOCR.Get_token_Res());
