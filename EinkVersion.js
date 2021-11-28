@@ -1,3 +1,139 @@
+"ui";
+
+var form = {
+    is获取书籍目录: true,
+    is获取书籍内容: true,
+    is从头开始截图: true,
+}
+
+ui.layout(
+    <drawer id="drawer">
+        <vertical>
+            <appbar>
+                <toolbar id="toolbar" title="微信读书资源下载助手"/>
+                <tabs id="tabs"/>
+            </appbar>
+            <Switch id="autoService" text="无障碍服务" checked="{{auto.service != null}}" padding="8 8 8 8" textSize="15sp"/>
+            <viewpager id="viewpager">
+                <frame>
+                    <ScrollView>
+                        <vertical>
+                            <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                            cardElevation="1dp" gravity="center_vertical">
+                            <ScrollView>
+                                <vertical padding="18 8" h="auto">
+                                    <text text="当前版本为初始功能，包含目录下载，内容截图等功能" textColor="#222222" textSize="14sp"/>
+                                    <text text="其他功能请期待，谢谢！" textColor="#999999" textSize="14sp"/>
+                                </vertical>
+                            </ScrollView>
+                            <View bg="#4caf50" h="*" w="10"/>
+                        </card>
+                <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                cardElevation="1dp" gravity="center_vertical">
+                    <ScrollView>
+                    <vertical padding="18 8" h="auto">
+                        <text id="当前时间" text="当前时间是：" gravity="center" textColor="#222222"/>
+                    </vertical>
+                    </ScrollView>
+                </card>
+                <card w="*" h="*" margin="10 5" cardCornerRadius="2dp"
+                cardElevation="1dp" gravity="center_vertical">
+                <ScrollView>
+                    <vertical padding="18 8" h="auto">
+                        <text text="下载功能选择：" textColor="#222222"/>
+                        <checkbox id="获取目录按钮" text="获取目录" checked = {form.is获取书籍目录}/>
+                        <checkbox id="获取内容按钮" text="获取内容" checked = {form.is获取书籍内容} marginTop="5"/>
+                        
+                        {/* <text textSize="16sp" textColor="black" text="需要截图的书籍页数"/>
+                        <input id="书籍截图总页数" text="99999" inputType="number"/> */}
+                        {/* <text textSize="16sp" textColor="black" text="选择第几本开始进行截图"/>
+                        <input id="第几本开始截图" text="1" inputType="number"/>
+                        <text textSize="16sp" textColor="black" text="需要截图的书籍数量"/>
+                        <input id="书籍截图数量" text="1" inputType="number"/> */}
+                        <text textSize="16sp" textColor="black" text="是否进行从头开始截图"/>
+                        <checkbox id="内容从头开始截图按钮" text="是" checked = {form.is从头开始截图} marginTop="5"/>
+                        
+                        <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
+                        <checkbox id="删除书籍按钮" text="是" checked = "false" marginTop="5"/>
+
+                        <text textSize="16sp" textColor="black" text="书籍离线预下载"/>
+                        <checkbox id="书籍离线预下载按钮" text="是" checked = "false" marginTop="5"/>
+                        {/* <text textSize="16sp" textColor="black" text="需要离线下载的书籍数量" /> */}
+                        {/* <input id="离线下载书籍数量" text="10" inputType="number" />  */}
+                                   
+                        <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/>
+                        
+                    </vertical>
+                </ScrollView>
+                <View bg="#2196f3" h="*" w="10"/>
+            </card>
+            <linear gravity="center">
+                <button id="start" text="开始运行" w="auto"/>
+                <button id="stop" text="退出"  w="auto"/>
+            </linear>
+        </vertical>
+    </ScrollView>
+    
+    </frame>
+    <frame>
+        <ScrollView>
+            <vertical>
+                
+            </vertical>
+        </ScrollView>
+    </frame>
+    </viewpager>
+    </vertical>
+    </drawer>
+);
+
+//设置滑动页面的标题
+ui.viewpager.setTitles(["任务列表", "其他"]);
+//让滑动页面和标签栏联动
+ui.tabs.setupWithViewPager(ui.viewpager);
+
+ui.autoService.on("check", function(checked) {
+    // 用户勾选无障碍服务的选项时，跳转到页面让用户去开启
+    if (checked && auto.service == null) {
+        app.startActivity({
+            action: "android.settings.ACCESSIBILITY_SETTINGS"
+        });
+    }
+    if (!checked && auto.service != null) {
+        auto.service.disableSelf();
+    }
+});
+
+ui.内容从头开始截图按钮.on("check", function(check) {
+    if (check)
+        form.is从头开始截图 = true;
+    else
+        form.is从头开始截图 = false;
+});
+
+ui.start.on("click", function() {
+    //程序开始运行之前判断无障碍服务
+    if (auto.service == null) {
+        toastLog("请先开启无障碍服务！");
+        return;
+    }
+    // form.value书籍截图总页数 = parseInt(ui.书籍截图总页数.getText());
+    // form.value书籍截图数量 = parseInt(ui.书籍截图数量.getText());
+    // form.value第几本开始截图 = parseInt(ui.第几本开始截图.getText());
+  //  form.value书籍离线下载数量 = parseInt(ui.离线下载书籍数量.getText());
+  threads.start(function() {
+    main()
+  })
+});
+
+ui.stop.on("click", function() {
+    threads.shutDownAll();
+    engines.stopAll();
+    exit();
+    toast("已终止执行脚本");
+});
+
+
 function Get_token_Res() {
     var API_Key = "4PtlSmrqerRG45vGF2DYaQ5L";
     var Secret_Key = "YMhDItMR3G5ul1zw0DEZn70NHah1ds8Z";
@@ -185,33 +321,37 @@ function 打开书籍(){
     return 当前书籍名
 }
 
-function 跳转到首页(){
-    while(!className("android.widget.TextView").text("进度").exists()){
-        log("当前包名："+currentPackage())
-        log("当前活动："+currentActivity())
-        if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
-            click(device.width/2, device.height/2)
+function 跳转到首页(currentPage){
+    if(currentPage == 1){
+        while(!className("android.widget.TextView").text("进度").exists()){
+            log("当前包名："+currentPackage())
+            log("当前活动："+currentActivity())
+            if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
+                click(device.width/2, device.height/2)
+                sleep(200)
+            }
+        }
+        
+        while(!className("android.widget.ImageButton").depth(15).id("vk").exists()){
+            className("android.widget.TextView").text("进度").depth(16).findOnce().parent().click()
             sleep(200)
         }
-    }
-    
-    while(!className("android.widget.ImageButton").depth(15).id("vk").exists()){
-        className("android.widget.TextView").text("进度").depth(16).findOnce().parent().click()
+        log("进入微信读书书本进度条页面")
+        swipe((className("android.widget.FrameLayout").depth(16).findOnce().bounds().left+className("android.widget.FrameLayout").depth(16).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(15).findOnce().bounds().top+className("android.widget.FrameLayout").depth(15).findOnce().bounds().bottom)/2, 
+        className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
         sleep(200)
+        click(device.width/2, device.height/2)
+        sleep(200)
+        log("进入书籍首页")
+
     }
-    log("进入微信读书书本进度条页面")
-    swipe((className("android.widget.FrameLayout").depth(16).findOnce().bounds().left+className("android.widget.FrameLayout").depth(16).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(15).findOnce().bounds().top+className("android.widget.FrameLayout").depth(15).findOnce().bounds().bottom)/2, 
-    className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
-    sleep(200)
-    click(device.width/2, device.height/2)
-    sleep(200)
-    log("进入书籍首页")
+
 }
 
 function 获取当前书籍存储路径(当前书籍名){
     var currentDate = new Date()
     var realMonth = currentDate.getMonth()+1
-    var dirName = "/storage/emulated/0/电子书/"+currentDate.getFullYear()+"-"+realMonth+"-"+currentDate.getDate()+"/"+当前书籍名+"/"  
+    var dirName = "/storage/emulated/0/Books/"+currentDate.getFullYear()+"-"+realMonth+"-"+currentDate.getDate()+"/"+当前书籍名+"/"  
     files.ensureDir(dirName)
     log("获取当前书籍存储路径并创建文件夹成功:"+dirName)
     return dirName
@@ -234,16 +374,16 @@ function 保存一页图片(dirName,imgType,currentPage,img){
         var page ="0"+currentPage
     }
     var currentFilePath = dirName + page+"." + imgType
-    images.save(img, currentFilePath, imgType,40)
+    images.save(img, currentFilePath, imgType,20)
     log("正在截图中，保存页："+currentPage)
 }
 
-function 截整本书(tokenRes,dirName){
+function 截整本书(tokenRes,dirName,currentPage){
     log("开始截图")
     var imgType = "jpg"
-    var currentPage = 1
     var ocrcurrentPage = 0
     var ocrendPage = -1
+    var tempPage = 0
     while(ocrcurrentPage != ocrendPage){
         if(!className("android.view.ViewGroup").depth(15).desc("字体").id("uz").exists()){
             if(!className("android.widget.TextView").depth(14).text("前路虽长，尤可期许").exists()){
@@ -252,8 +392,8 @@ function 截整本书(tokenRes,dirName){
                 sleep(20)
                 var clip = images.clip(img, device.width - 300, device.height - 120, 300, 120);
                 sleep(20);
-                // var currentFilePath = dirName + currentPage+"-1." + imgType
-                // images.save(clip, currentFilePath, imgType,100)
+                //  var currentFilePath = dirName + currentPage+"-1." + imgType
+                //  images.save(clip, currentFilePath, imgType,100)
                 var result = BaiDu_ocr(tokenRes, clip, false,imgType);
                 clip.recycle()
                 log("result")
@@ -281,21 +421,48 @@ function 截整本书(tokenRes,dirName){
                         }
                     }
 
-                    if(ocrcurrentPage==currentPage){
+                    
+                    if(currentPage-ocrcurrentPage == 1){
+                        向前翻页()
+                        currentPage--
+                    }
+                    else{
                         press(device.width-60,device.height-60,10)
                         sleep(100)
+                        if(currentPage == 0){
+                            currentPage = ocrcurrentPage
+                        }
                         保存一页图片(dirName,imgType,currentPage,img)
                         currentPage++
                     }
-                    else if(ocrcurrentPage>currentPage){
-                        向前翻页()
-                        log("当前页面太大")
+
+                    // if(ocrcurrentPage==currentPage){
+                    //     press(device.width-60,device.height-60,10)
+                    //     sleep(100)
+                    //     保存一页图片(dirName,imgType,currentPage,img)
+                    //     currentPage++
+                    // }
+                    // else if(ocrcurrentPage>currentPage){
                         
-                    }
-                    else if(ocrcurrentPage<currentPage){
-                        向后翻页()
-                        log("当前页面太小")
-                    }
+                    //     if(currentPage == tempPage){
+                    //         press(device.width-60,device.height-60,10)
+                    //         sleep(100)
+                    //         保存一页图片(dirName,imgType,currentPage,img)
+                    //         currentPage++
+                    //         tempPage = 0
+                    //     }
+                    //     else{
+                    //         向前翻页()
+                    //         log("当前页面太大")
+                    //         tempPage = currentPage
+                    //         currentPage--
+                    //     }                       
+                    // }
+                    // else if(ocrcurrentPage<currentPage){
+                    //     向后翻页()
+                    //     log("当前页面太小")
+                    //    // currentPage++
+                    // }
                     
                 }      
                 
@@ -319,46 +486,60 @@ function 截整本书(tokenRes,dirName){
 
 }
 
-device.keepScreenOn()
-删除全部其他脚本()
+function main(){
 
-打开微信读书()
+    if(form.is从头开始截图 == true){
+        var currentPage = 1
+    }
+    else{
+        var currentPage = 0
+    }
 
-进入书架界面()
+    
+    device.keepScreenOn()
+    删除全部其他脚本()
+    
+    打开微信读书()
+    
+    进入书架界面()
+    
+    var 当前书籍名 = 打开书籍()
+    
+    跳转到首页(currentPage)
+    
+    var dirName = 获取当前书籍存储路径(当前书籍名)
+    
+    打开截图权限()
+    
+    var tokenRes= Get_token_Res()
+    
+    截整本书(tokenRes,dirName,currentPage)
+    
+        // var img1 = images.copy(img)
+        // sleep(100)
+        // img = captureScreen()
+        // var img2 = images.copy(img)
+        // sleep(100)
+        // var p =  findImage(img1, img2,{
+        //      threshold: 1})
+    
+        // log("p="+p)
+    
+        // while(!p){
+        //     img1 =images.copy(img)
+        //     img = captureScreen()
+        //     img2 = images.copy(img)
+        //     sleep(100)
+        //     p =  findImage(img1, img2,{
+        //         threshold: 1})
+        //     log("截图未准备好")
+        // }
+    toastLog("截图完成退出")
+    device.cancelKeepingAwake()
 
-var 当前书籍名 = 打开书籍()
 
-跳转到首页()
+}
 
-var dirName = 获取当前书籍存储路径(当前书籍名)
-
-打开截图权限()
-
-var tokenRes= Get_token_Res()
-
-截整本书(tokenRes,dirName)
-
-    // var img1 = images.copy(img)
-    // sleep(100)
-    // img = captureScreen()
-    // var img2 = images.copy(img)
-    // sleep(100)
-    // var p =  findImage(img1, img2,{
-    //      threshold: 1})
-
-    // log("p="+p)
-
-    // while(!p){
-    //     img1 =images.copy(img)
-    //     img = captureScreen()
-    //     img2 = images.copy(img)
-    //     sleep(100)
-    //     p =  findImage(img1, img2,{
-    //         threshold: 1})
-    //     log("截图未准备好")
-    // }
-toastLog("截图完成退出")
-device.cancelKeepingAwake()
 
 
 

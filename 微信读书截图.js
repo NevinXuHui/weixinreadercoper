@@ -75,7 +75,7 @@ ui.layout(
             </card>
             <linear gravity="center">
                 <button id="start" text="开始运行" style="Widget.AppCompat.Button.Colored" w="auto"/>
-                <button id="stop" text="停止运行"  w="auto"/>
+                <button id="stop" text="退出"  w="auto"/>
             </linear>
         </vertical>
     </ScrollView>
@@ -92,6 +92,9 @@ ui.layout(
     </vertical>
     </drawer>
 );
+
+
+
 
 //设置滑动页面的标题
 ui.viewpager.setTitles(["任务列表", "其他"]);
