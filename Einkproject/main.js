@@ -4,7 +4,7 @@ importClass(android.widget.SeekBar);
 importClass(java.io.File);
 
 var 测试列表Value = null
-var 图片压缩比Value = null;
+var 图片压缩比Value = 0;
 var 内容从头开始截图按钮Value = null;//BindVar-Create 内容从头开始截图按钮
 var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
@@ -208,6 +208,9 @@ function main(){
     }
 
     log("currentPage:"+currentPage);
+
+    log("图片压缩比Value的类型:"+typeof(图片压缩比Value))
+    log("图片压缩比Value:"+图片压缩比Value)
     device.keepScreenOn()
 
     EinkRead.删除全部其他脚本()
@@ -216,9 +219,13 @@ function main(){
 
     EinkRead.进入书架界面()
     var bookNameList = EinkRead.获取书架列表()
-    dialogFile.下载数据选择对话框(bookNameList)
 
-    var 当前书籍名 = EinkRead.打开书籍()
+    var choiceBookindex = dialogFile.下载数据选择对话框(bookNameList)
+
+    log("choiceBookindex:"+choiceBookindex)
+
+
+    var 当前书籍名 = EinkRead.打开书籍(choiceBookindex)
 
     EinkRead.跳转到首页(currentPage)
     
@@ -236,7 +243,7 @@ function main(){
 }
 
 
-toastLog('Hello, Auto.js ' + $app.autojs.versionName);
+//toastLog('Hello, Auto.js ' + $app.autojs.versionName);
 
 // var jsonData = readJSON("project.json")
 // writeJSON("data.json",jsonData)
@@ -246,4 +253,4 @@ var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
 var jsonUtil = require('jsonUtil.js');
 var dialogFile = require('dialogFile.js');
-console.log("baiduocr token:", baiduOCR.Get_token_Res());
+//console.log("baiduocr token:", baiduOCR.Get_token_Res());

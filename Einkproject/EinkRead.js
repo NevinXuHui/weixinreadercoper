@@ -131,22 +131,23 @@ EinkRead.进入书架界面 = function(){
   sleep(500)
 }
 
-EinkRead.打开书籍 = function(){
-  var 当前书籍名 = className("android.widget.TextView").depth(17).id("d8").findOnce().text().replace(/\[icon\]/ig,"");
-  className("android.widget.RelativeLayout").depth(17).findOnce().parent().click()
+EinkRead.打开书籍 = function(choiceBookindex){
+  var 当前书籍名 = className("android.widget.TextView").depth(17).id("d8").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
+  className("android.widget.RelativeLayout").depth(17).findOnce(choiceBookindex).parent().click()
   
   log("当前书籍名："+当前书籍名)
   return 当前书籍名
 }
 
 EinkRead.跳转到首页 = function(currentPage){
-  if(currentPage == 1){
+  
       while(!className("android.widget.TextView").text("进度").exists()){
           log("当前包名："+currentPackage())
           log("当前活动："+currentActivity())
           if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
+             // swipe(device.width/2, device.height/2,device.width/2,device.height*3/8,50)
               click(device.width/2, device.height/2)
-              sleep(200)
+              sleep(500)
           }
       }
       
@@ -155,14 +156,17 @@ EinkRead.跳转到首页 = function(currentPage){
           sleep(200)
       }
       log("进入微信读书书本进度条页面")
-      swipe((className("android.widget.FrameLayout").depth(16).findOnce().bounds().left+className("android.widget.FrameLayout").depth(16).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(15).findOnce().bounds().top+className("android.widget.FrameLayout").depth(15).findOnce().bounds().bottom)/2, 
-      className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
-      sleep(200)
-      click(device.width/2, device.height/2)
-      sleep(200)
-      log("进入书籍首页")
+      if(currentPage == 1){
+        swipe((className("android.widget.FrameLayout").depth(16).findOnce().bounds().left+className("android.widget.FrameLayout").depth(16).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(15).findOnce().bounds().top+className("android.widget.FrameLayout").depth(15).findOnce().bounds().bottom)/2, 
+        className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
+        sleep(200)
+        log("进入书籍首页")
+        }
+        click(device.width/2, device.height/2)
+        sleep(200)
+        
 
-  }
+
 
 }
 
@@ -254,7 +258,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                       if(currentPage == 0){
                           currentPage = ocrcurrentPage
                       }
-                      EinkRead.保存一页图片(dirName,imgType,currentPage,img)
+                      EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       currentPage++
                   }
 

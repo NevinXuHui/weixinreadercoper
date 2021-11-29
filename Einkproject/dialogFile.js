@@ -28,14 +28,31 @@ dialogFile.thelist = function(str) {
 
 
 dialogFile.下载数据选择对话框 = function(bookNameList){
+    var choiceBookindex = null
+    var lock = threads.lock()
+    var complete = lock.newCondition()
+    // var sum = threads.disposable();
+    threads.start(function(){
+        dialogs.build({
+            title: "请选择",
+            items: bookNameList,
+            itemsSelectMode: "single"
+        }).on("single_choice", (index, item, dialog) => {
+            toastLog("选择了66666"+item)
+            choiceBookindex = index
+            // sum.setAndNotify(item);
+            //通知主线程接收结果
+            lock.lock();
+            complete.signal();
+            lock.unlock();
+        }).show();
+        
 
-    dialogs.build({
-        title: "请选择",
-        items: bookNameList,
-        itemsSelectMode: "select"
-    }).on("item_select", (index, item, dialog) => {
-        toastLog("选择了"+item)
-    }).show();
+   })
+    lock.lock()
+    complete.await()
+    lock.unlock()
+    return choiceBookindex
 
     // dialogs.build({
     //     title: "单选",
