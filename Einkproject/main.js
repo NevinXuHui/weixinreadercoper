@@ -215,10 +215,13 @@ function main(){
     EinkRead.打开微信读书()
 
     EinkRead.进入书架界面()
+    var bookNameList = EinkRead.获取书架列表()
+    dialogFile.下载数据选择对话框(bookNameList)
 
     var 当前书籍名 = EinkRead.打开书籍()
 
     EinkRead.跳转到首页(currentPage)
+    
 
     var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
 

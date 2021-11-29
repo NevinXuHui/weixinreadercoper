@@ -26,4 +26,50 @@ dialogFile.thelist = function(str) {
     }).show();
 }
 
+
+dialogFile.下载数据选择对话框 = function(bookNameList){
+
+    dialogs.build({
+        title: "请选择",
+        items: bookNameList,
+        itemsSelectMode: "select"
+    }).on("item_select", (index, item, dialog) => {
+        toastLog("选择了"+item)
+    }).show();
+
+    // dialogs.build({
+    //     title: "单选",
+    //     items: ["选项1", "选项2", "选项3", "选项4"],
+    //     itemsSelectMode: "single",
+    //     itemsSelectedIndex: 3
+    // }).on("single_choice", (index, item)=>{
+    //     toast("您选择的是" + item);
+    // }).show();
+    // dialogs.build({
+    //     //对话框标题
+    //     title: "发现新版本",
+    //     //对话框内容
+    //     content: "更新日志: 新增了若干了BUG",
+    //     //确定键内容
+    //     positive: "下载",
+    //     //取消键内容
+    //     negative: "取消",
+    //     //中性键内容
+    //     neutral: "到浏览器下载",
+    //     //勾选框内容
+    //     checkBoxPrompt: "不再提示"
+    // }).on("positive", ()=>{
+    //     //监听确定键
+    //     toast("开始下载....");
+    // }).on("neutral", ()=>{
+    //     //监听中性键
+    //     app.openUrl("https://www.autojs.org");
+    
+    // }).on("check", (checked)=>{
+    //     //监听勾选框
+    //     log(checked);
+    // }).show();
+
+}
+
 module.exports =dialogFile

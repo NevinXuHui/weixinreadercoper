@@ -245,8 +245,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
                   
                   if(currentPage-ocrcurrentPage == 1){
-                      向前翻页()
-                      currentPage--
+                    EinkRead.向前翻页()
+                    currentPage--
                   }
                   else{
                       press(device.width-60,device.height-60,10)
@@ -306,6 +306,21 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
   }
 
 
+}
+
+EinkRead.获取书架列表 = function(){
+    var bookNameList = []
+    var 书架列表 = className("android.widget.RelativeLayout").depth(16).clickable().find()
+    书架列表.forEach(function(item, index){
+        item.children().forEach(function(item2, index2){
+            if(item2.className()=="android.widget.TextView"){
+                log(item2.text().replace(/\[icon\]/ig,""))
+                bookNameList.push(item2.text().replace(/\[icon\]/ig,""))
+            }
+        })
+    })
+    log("获取书架数据成功")
+    return bookNameList
 }
 
 module.exports = EinkRead;
