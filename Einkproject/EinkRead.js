@@ -204,7 +204,7 @@ EinkRead.保存一页图片 = function(dirName,imgType,currentPage,img,图片压
   log("正在截图中，保存页："+currentPage)
 }
 
-EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value){
+EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr){
   log("开始截图")
   var imgType = "jpg"
   var ocrcurrentPage = 0
@@ -220,10 +220,24 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
               sleep(20);
               //  var currentFilePath = dirName + currentPage+"-1." + imgType
               //  images.save(clip, currentFilePath, imgType,100)
-              var result = baiduOCR.BaiDu_ocr(tokenRes, clip, false,imgType);
+              //var result = baiduOCR.BaiDu_ocr(tokenRes, clip, false,imgType);
+
+              var results = ocr.ocrImage(clip);
+              log("results:"+results);
+
+            //   var results = ocr.detect(clip.getBitmap(),0.5)
+            //   console.info("过滤前结果数："+results.size())
+            //   results = ocr.filterScore(results,0.5,0.5,0.5)
+            //     //输出最终结果
+            //     for(var i=0;i<results.size();i++){ 
+            //     var re = results.get(i)
+            //     log("结果:"+i+"  文字:"+re.text+"  位置:"+re.frame+"  角度类型:"+re.angleType)
+            //     log("区域置信度:"+re.dbScore+"  角度置信度:"+re.angleScore+"  文字置信度:"+re.crnnScore+"\n")
+            //     }
+ 
               clip.recycle()
-              log("result")
-              log(result)
+              //log("result")
+              //log(result)
               sleep(20);
       
               //第一页
@@ -233,26 +247,29 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                   EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                   currentPage++
               }
-              if(result.words_result_num>0)
+
+              //if(result.words_result_num>0)
+              if(results.success == true)
               {
-                  var integralContent = result.words_result[0].words.split('/');
-                  ocrcurrentPage = integralContent[0];
-                  ocrendPage = integralContent[1]
-                  log("ocrcurrentPage:"+ocrcurrentPage)
-                  log("currentPage:"+currentPage)
+                  //var integralContent = result.words_result[0].words.split('/');
+                  var integralContent = results.text.split('/');
+                  if(integralContent.length>=2){
+                      log("integralContent.length:"+integralContent.length)
+                    ocrcurrentPage = integralContent[0];
+                    ocrendPage = integralContent[1]
+                    log("ocrcurrentPage:"+ocrcurrentPage)
+                    log("currentPage:"+currentPage)
                   //最后一页
-                  if(integralContent[0] == integralContent[1] ){
+                    if(integralContent[0] == integralContent[1] ){
                       if(currentPage == integralContent[0]){
                         EinkRead.获取目录(dirName,1)
                       }
-                  }
-
-                  
-                  if(currentPage-ocrcurrentPage == 1){
-                    EinkRead.向前翻页()
-                    currentPage--
-                  }
-                  else{
+                    }
+                    if(currentPage-ocrcurrentPage == 1){
+                        EinkRead.向前翻页()
+                        currentPage--
+                    }
+                    else{
                       press(device.width-60,device.height-60,10)
                       sleep(100)
                       if(currentPage == 0){
@@ -260,7 +277,13 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                       }
                       EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       currentPage++
+                    }
                   }
+                  else{
+                    ocrcurrentPage = 0
+                    ocrendPage = 99999
+                  }
+                  
 
                   // if(ocrcurrentPage==currentPage){
                   //     press(device.width-60,device.height-60,10)

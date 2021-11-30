@@ -2,6 +2,13 @@
 importClass(android.widget.AdapterView);
 importClass(android.widget.SeekBar);
 importClass(java.io.File);
+//导入插件
+//var ocr = $plugins.load("com.hraps.ocr")
+var OCR = $plugins.load('org.autojs.plugin.ocr');
+var ocr = new OCR();
+$events.on('exit', () => {
+    ocr.end();
+});
 
 var 测试列表Value = null
 var 图片压缩比Value = 0;
@@ -236,7 +243,7 @@ function main(){
 
     var tokenRes= baiduOCR.Get_token_Res()
 
-    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value)
+    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr)
     toastLog("截图完成退出")
     device.cancelKeepingAwake()
 
