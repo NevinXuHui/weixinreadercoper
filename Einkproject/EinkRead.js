@@ -134,12 +134,40 @@ EinkRead.进入书架界面 = function(){
 EinkRead.打开书籍 = function(choiceBookindex){
   var 当前书籍名 = className("android.widget.TextView").depth(17).id("d8").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
   className("android.widget.RelativeLayout").depth(17).findOnce(choiceBookindex).parent().click()
-  
   log("当前书籍名："+当前书籍名)
   return 当前书籍名
 }
 
-EinkRead.跳转到首页 = function(currentPage){
+EinkRead.设置为已下载模式 = function(){
+  while(!className("android.widget.TextView").depth(16).text("已下载").exists()){
+    sleep(500)
+  }
+
+}
+
+EinkRead.显示想法设置 = function(显示想法按钮Value){
+  if(显示想法按钮Value == true){
+    while(!className("android.widget.TextView").depth(16).text("已显示想法").exists()){
+      if(className("android.widget.TextView").depth(16).text("显示想法").exists()){
+        className("android.view.ViewGroup").depth(15).id("we").findOnce().click()
+        sleep(2000)
+      }
+      sleep(500)
+    }
+  }else{
+    while(!className("android.widget.TextView").depth(16).text("显示想法").exists()){
+      if(className("android.widget.TextView").depth(16).text("已显示想法").exists()){
+        className("android.view.ViewGroup").depth(15).id("we").findOnce().click()
+        sleep(2000)
+      }
+      sleep(500)
+    }
+  }
+
+}
+
+
+EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value){
   
       while(!className("android.widget.TextView").text("进度").exists()){
           log("当前包名："+currentPackage())
@@ -150,7 +178,12 @@ EinkRead.跳转到首页 = function(currentPage){
               sleep(500)
           }
       }
+
+      EinkRead.设置为已下载模式()
+      EinkRead.显示想法设置(显示想法按钮Value)
       
+
+
       while(!className("android.widget.ImageButton").depth(15).id("vk").exists()){
           className("android.widget.TextView").text("进度").depth(16).findOnce().parent().click()
           sleep(200)
@@ -161,13 +194,12 @@ EinkRead.跳转到首页 = function(currentPage){
         className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
         sleep(200)
         log("进入书籍首页")
-        }
-        click(device.width/2, device.height/2)
-        sleep(200)
-        
+      }
 
 
 
+      click(device.width/2, device.height/2)
+      sleep(200)
 }
 
 EinkRead.获取当前书籍存储路径 = function(当前书籍名){
@@ -264,22 +296,24 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                     ocrendPage = parseInt(integralContent[1])
                     log("ocrcurrentPage:"+ocrcurrentPage)
                     log("currentPage:"+currentPage)
+                    log("ocrendPage:"+ocrendPage)
                   //最后一页
-                    if(ocrcurrentPage == ocrendPage ){
+                    
+                    if(className("android.widget.TextView").depth(16).text("全书完").exists()){
+                      ocrendPage = ocrcurrentPage
+                      currentPage = ocrcurrentPage                      
+                      EinkRead.获取目录(dirName,1)
+                      log("获取了全书完文字后获取目录成功")
+                      log("获取目录后ocrcurrentPage:"+ocrcurrentPage)
+                      log("获取目录后ocrendPage:"+ocrendPage)
+                    }else if(ocrcurrentPage == ocrendPage ){
                       if(currentPage == ocrcurrentPage){
                         EinkRead.获取目录(dirName,1)
                         log("截图ocr匹配获取目录成功")
                       }
                     }
-                    else if(className("android.widget.TextView").depth(16).text("全书完").exists()){
-                      log("获取了全书完文字")
-                      ocrendPage = ocrcurrentPage
-                      currentPage = ocrcurrentPage
-                      
-                      EinkRead.获取目录(dirName,1)
-                      log("获取目录后ocrcurrentPage:"+ocrcurrentPage)
-                      log("获取目录后ocrendPage:"+ocrendPage)
-                    }
+
+
                     if((currentPage-ocrcurrentPage) == 1){
                         EinkRead.向前翻页()
                         currentPage = currentPage-2

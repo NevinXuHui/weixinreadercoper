@@ -17,6 +17,8 @@ var 翻页延时时间Value = 0;
 var 内容从头开始截图按钮Value = null;//BindVar-Create 内容从头开始截图按钮
 
 var 自动获取书籍按钮Value = null;//BindVar-Create 获取内容按钮
+
+var 显示想法按钮Value = null;
 var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
 var entries = "1|2|3|4|5"
@@ -63,6 +65,7 @@ ui.layout(
                         <text text="当前翻页延时100ms" id="当前翻页延时显示值" textColor="#222222"/>
                         <text text="下载功能选择：" textColor="#222222"/>
                         <checkbox id="自动获取书籍按钮" text="自动获取书籍" checked = "true"/>
+                        <checkbox id="显示想法按钮" text="显示想法" checked = "true"/>
                         <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
                         <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/>
                         
@@ -168,11 +171,14 @@ function initUiValue(){
     ui.自动获取书籍按钮.setChecked(uiStorage.get("自动获取书籍按钮",false));
     ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
     ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
+    ui.显示想法按钮.setChecked(uiStorage.get("显示想法按钮",false));
 
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
     获取内容按钮Value = ui.获取内容按钮.checked;
     获取目录按钮Value = ui.获取目录按钮.checked;
+    显示想法按钮Value = ui.显示想法按钮.checked;
+
     连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
     图片压缩比Value = ui.图片压缩比.getProgress();
     翻页延时时间Value = ui.翻页延时.getProgress();
@@ -189,6 +195,7 @@ function saveUiValue(){
     uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
+    uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
     
 }
 
@@ -211,6 +218,11 @@ ui.获取内容按钮.on("check",(checked)=>{
 ui.获取目录按钮.on("check",(checked)=>{
     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
     获取目录按钮Value = ui.获取目录按钮.checked;
+});
+
+ui.显示想法按钮.on("check",(checked)=>{
+    uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
+    显示想法按钮Value = ui.显示想法按钮.checked;
 });
 
 ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
@@ -265,9 +277,8 @@ function main(){
 
         var 当前书籍名 = EinkRead.打开书籍(choiceBookindex)
 
-        EinkRead.跳转到首页(currentPage)
+        EinkRead.跳转到首页(currentPage,显示想法按钮Value)
         
-    
         var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
     
         EinkRead.打开截图权限()
