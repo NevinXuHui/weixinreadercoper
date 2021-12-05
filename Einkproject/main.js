@@ -12,7 +12,11 @@ $events.on('exit', () => {
 
 var 测试列表Value = null
 var 图片压缩比Value = 0;
+var 翻页延时时间Value = 0;
+
 var 内容从头开始截图按钮Value = null;//BindVar-Create 内容从头开始截图按钮
+
+var 自动获取书籍按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
 var entries = "1|2|3"
@@ -54,7 +58,10 @@ ui.layout(
                         <spinner id="测试列表" entries="{{entries}}"/>
                         <seekbar id="图片压缩比"/>
                         <text text="当前图片压缩比20%" id="当前图片压缩比显示值" textColor="#222222"/>
+                        <seekbar id="翻页延时"/>
+                        <text text="当前翻页延时100ms" id="当前翻页延时显示值" textColor="#222222"/>
                         <text text="下载功能选择：" textColor="#222222"/>
+                        <checkbox id="自动获取书籍按钮" text="自动获取书籍" checked = "true"/>
                         <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
                         <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/>
                         
@@ -155,24 +162,31 @@ initUiValue();
 
 function initUiValue(){
     ui.图片压缩比.setProgress(uiStorage.get("图片压缩比",0));
+    ui.翻页延时.setProgress(uiStorage.get("翻页延时",0));
+
     ui.测试列表.setSelection(uiStorage.get("测试列表",0));
     ui.内容从头开始截图按钮.setChecked(uiStorage.get("内容从头开始截图按钮",false));
+    ui.自动获取书籍按钮.setChecked(uiStorage.get("自动获取书籍按钮",false));
     ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
     ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
 
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
+    自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
     获取内容按钮Value = ui.获取内容按钮.checked;
     获取目录按钮Value = ui.获取目录按钮.checked;
     测试列表Value = ui.测试列表.getSelectedItem();
     图片压缩比Value = ui.图片压缩比.getProgress();
+    翻页延时时间Value = ui.翻页延时.getProgress();
 
     ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
-
+    ui.当前翻页延时显示值.text("当前翻页延时"+翻页延时时间Value*5)
 }
 function saveUiValue(){
     uiStorage.put("图片压缩比",ui.图片压缩比.getProgress());
+    uiStorage.put("翻页延时",ui.翻页延时.getProgress());
     uiStorage.put("测试列表",ui.测试列表.getSelectedItemPosition());
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
+    uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
     
@@ -181,6 +195,11 @@ function saveUiValue(){
 ui.内容从头开始截图按钮.on("check",(checked)=>{
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
+
+});
+ui.自动获取书籍按钮.on("check",(checked)=>{
+    uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
+    自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
 
 });
 //Bind-Connect 获取内容按钮
@@ -197,13 +216,19 @@ ui.获取目录按钮.on("check",(checked)=>{
 ui.测试列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
     // 测试列表Value = ui.测试列表.getSelectedItemPosition();
     测试列表Value = ui.测试列表.getSelectedItem();
-    toastLog(测试列表Value)
+   // toastLog(测试列表Value)
 }}));
 
 ui.图片压缩比.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
     图片压缩比Value = ui.图片压缩比.getProgress();
-    toastLog("比例改变："+图片压缩比Value)
+   // toastLog("比例改变："+图片压缩比Value)
     ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
+}}));
+
+ui.翻页延时.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
+    翻页延时时间Value = ui.翻页延时.getProgress();
+   // toastLog("比例改变："+图片压缩比Value)
+    ui.当前翻页延时显示值.text("当前翻页延时"+翻页延时时间Value*5)
 }}));
 
 function main(){
@@ -225,9 +250,13 @@ function main(){
     EinkRead.打开微信读书()
 
     EinkRead.进入书架界面()
-    var bookNameList = EinkRead.获取书架列表()
 
-    var choiceBookindex = dialogFile.下载数据选择对话框(bookNameList)
+    if(自动获取书籍按钮Value == true){
+        var choiceBookindex = 0
+    }else{
+        var bookNameList = EinkRead.获取书架列表()
+        var choiceBookindex = dialogFile.下载数据选择对话框(bookNameList)
+    }
 
     log("choiceBookindex:"+choiceBookindex)
 
@@ -243,7 +272,7 @@ function main(){
 
     var tokenRes= baiduOCR.Get_token_Res()
 
-    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr)
+    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value)
     toastLog("截图完成退出")
     device.cancelKeepingAwake()
 

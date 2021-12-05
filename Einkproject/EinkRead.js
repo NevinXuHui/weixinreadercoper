@@ -204,12 +204,14 @@ EinkRead.保存一页图片 = function(dirName,imgType,currentPage,img,图片压
   log("正在截图中，保存页："+currentPage)
 }
 
-EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr){
+EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,delayValue){
   log("开始截图")
   var imgType = "jpg"
   var ocrcurrentPage = 0
   var ocrendPage = -1
   var tempPage = 0
+  var lastOcrValue = null
+  var lastPage = 0
   while(ocrcurrentPage != ocrendPage){
       if(!className("android.view.ViewGroup").depth(15).desc("字体").id("uz").exists()){
           if(!className("android.widget.TextView").depth(14).text("前路虽长，尤可期许").exists()){
@@ -224,6 +226,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
               var results = ocr.ocrImage(clip);
               log("results:"+results);
+              log("lastOcrValue:"+lastOcrValue)
 
             //   var results = ocr.detect(clip.getBitmap(),0.5)
             //   console.info("过滤前结果数："+results.size())
@@ -255,35 +258,58 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                   var integralContent = results.text.split('/');
                   if(integralContent.length>=2){
                       log("integralContent.length:"+integralContent.length)
-                    ocrcurrentPage = integralContent[0];
-                    ocrendPage = integralContent[1]
+                    ocrcurrentPage = parseInt(integralContent[0])
+                    ocrendPage = parseInt(integralContent[1])
                     log("ocrcurrentPage:"+ocrcurrentPage)
                     log("currentPage:"+currentPage)
                   //最后一页
-                    if(integralContent[0] == integralContent[1] ){
-                      if(currentPage == integralContent[0]){
+                    if(ocrcurrentPage == ocrendPage ){
+                      if(currentPage == ocrcurrentPage){
                         EinkRead.获取目录(dirName,1)
                       }
                     }
-                    if(currentPage-ocrcurrentPage == 1){
+                    if((currentPage-ocrcurrentPage) == 1){
                         EinkRead.向前翻页()
-                        currentPage--
+                        currentPage = currentPage-2
                     }
                     else{
                       press(device.width-60,device.height-60,10)
-                      sleep(100)
+                      sleep(delayValue*5)
                       if(currentPage == 0){
                           currentPage = ocrcurrentPage
+                      } 
+                      if(((ocrcurrentPage-currentPage)<=2) &&((ocrcurrentPage-currentPage)>=0)){
+                        currentPage = ocrcurrentPage
                       }
+
                       EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       currentPage++
                     }
                   }
                   else{
+                    if(lastOcrValue ==results.text){
+                      lastOcrValue=null
+                      press(device.width-60,device.height-60,10)
+                      sleep(1000)
+                      if(currentPage == 0){
+                          currentPage = ocrcurrentPage
+                      }
+                      if(((ocrcurrentPage-currentPage)<=2)&&((ocrcurrentPage-currentPage)>=0)){
+                        currentPage = ocrcurrentPage
+                      }
+
+                      EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
+                      log("currentPage:"+currentPage)
+                      currentPage++
+                      
+
+                    }
+                    log("currentPage2:"+currentPage)
+                    
                     ocrcurrentPage = 0
                     ocrendPage = 99999
                   }
-                  
+                  lastOcrValue= results.text
 
                   // if(ocrcurrentPage==currentPage){
                   //     press(device.width-60,device.height-60,10)
@@ -313,7 +339,12 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                   //    // currentPage++
                   // }
                   
-              }      
+              } 
+              else{
+                log("未发现ocr数据，暂停中。。。")
+                sleep(1000)
+                
+              }     
               
           }
       }
