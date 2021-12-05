@@ -216,6 +216,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
       if(!className("android.view.ViewGroup").depth(15).desc("字体").id("uz").exists()){
           if(!className("android.widget.TextView").depth(14).text("前路虽长，尤可期许").exists()){
 
+           // if(className("android.widget.TextView").depth(16).text("全书完").exists())
+
               var img = captureScreen()
               sleep(20)
               var clip = images.clip(img, device.width - 300, device.height - 120, 300, 120);
@@ -266,7 +268,17 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                     if(ocrcurrentPage == ocrendPage ){
                       if(currentPage == ocrcurrentPage){
                         EinkRead.获取目录(dirName,1)
+                        log("截图ocr匹配获取目录成功")
                       }
+                    }
+                    else if(className("android.widget.TextView").depth(16).text("全书完").exists()){
+                      log("获取了全书完文字")
+                      ocrendPage = ocrcurrentPage
+                      currentPage = ocrcurrentPage
+                      
+                      EinkRead.获取目录(dirName,1)
+                      log("获取目录后ocrcurrentPage:"+ocrcurrentPage)
+                      log("获取目录后ocrendPage:"+ocrendPage)
                     }
                     if((currentPage-ocrcurrentPage) == 1){
                         EinkRead.向前翻页()
@@ -284,6 +296,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
                       EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       currentPage++
+                      log("截图完后ocrcurrentPage:"+ocrcurrentPage)
+                      log("截图完后ocrendPage:"+ocrendPage)
                     }
                   }
                   else{
@@ -297,12 +311,9 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                       if(((ocrcurrentPage-currentPage)<=2)&&((ocrcurrentPage-currentPage)>=0)){
                         currentPage = ocrcurrentPage
                       }
-
                       EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       log("currentPage:"+currentPage)
                       currentPage++
-                      
-
                     }
                     log("currentPage2:"+currentPage)
                     

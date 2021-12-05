@@ -10,7 +10,7 @@ $events.on('exit', () => {
     ocr.end();
 });
 
-var 测试列表Value = null
+var 连续获取书籍数量列表Value = null
 var 图片压缩比Value = 0;
 var 翻页延时时间Value = 0;
 
@@ -19,7 +19,7 @@ var 内容从头开始截图按钮Value = null;//BindVar-Create 内容从头开�
 var 自动获取书籍按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
-var entries = "1|2|3"
+var entries = "1|2|3|4|5"
 
 ui.layout(
     <drawer id="drawer">
@@ -55,7 +55,8 @@ ui.layout(
                 cardElevation="1dp" gravity="center_vertical">
                 <ScrollView>
                     <vertical padding="18 8" h="auto">
-                        <spinner id="测试列表" entries="{{entries}}"/>
+                        <text text="连续获取书籍数量" textColor="#222222"/>
+                        <spinner id="连续获取书籍数量列表" entries="{{entries}}"/>
                         <seekbar id="图片压缩比"/>
                         <text text="当前图片压缩比20%" id="当前图片压缩比显示值" textColor="#222222"/>
                         <seekbar id="翻页延时"/>
@@ -152,19 +153,17 @@ ui.start.on("click",()=>{
 //BindSdcard-Init&Save
 var uiStorage = storages.create("STORAGE_UI_VALUE_789185");
 ui.emitter.on("resume",()=>{
+    log("resume initUiValue")
     initUiValue();
 });
 ui.emitter.on("pause",()=>{
     saveUiValue();
 });
 
-initUiValue();
-
 function initUiValue(){
     ui.图片压缩比.setProgress(uiStorage.get("图片压缩比",0));
     ui.翻页延时.setProgress(uiStorage.get("翻页延时",0));
-
-    ui.测试列表.setSelection(uiStorage.get("测试列表",0));
+    ui.连续获取书籍数量列表.setSelection(uiStorage.get("连续获取书籍数量",0));
     ui.内容从头开始截图按钮.setChecked(uiStorage.get("内容从头开始截图按钮",false));
     ui.自动获取书籍按钮.setChecked(uiStorage.get("自动获取书籍按钮",false));
     ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
@@ -174,17 +173,18 @@ function initUiValue(){
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
     获取内容按钮Value = ui.获取内容按钮.checked;
     获取目录按钮Value = ui.获取目录按钮.checked;
-    测试列表Value = ui.测试列表.getSelectedItem();
+    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
     图片压缩比Value = ui.图片压缩比.getProgress();
     翻页延时时间Value = ui.翻页延时.getProgress();
 
     ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
     ui.当前翻页延时显示值.text("当前翻页延时"+翻页延时时间Value*5)
+    log("initUiValue...")
 }
 function saveUiValue(){
     uiStorage.put("图片压缩比",ui.图片压缩比.getProgress());
     uiStorage.put("翻页延时",ui.翻页延时.getProgress());
-    uiStorage.put("测试列表",ui.测试列表.getSelectedItemPosition());
+    uiStorage.put("连续获取书籍数量",ui.连续获取书籍数量列表.getSelectedItemPosition());
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
@@ -213,9 +213,10 @@ ui.获取目录按钮.on("check",(checked)=>{
     获取目录按钮Value = ui.获取目录按钮.checked;
 });
 
-ui.测试列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
+ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
     // 测试列表Value = ui.测试列表.getSelectedItemPosition();
-    测试列表Value = ui.测试列表.getSelectedItem();
+    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
+    log("连续获取书籍数量列表Value:"+连续获取书籍数量列表Value)
    // toastLog(测试列表Value)
 }}));
 
@@ -245,8 +246,6 @@ function main(){
     log("图片压缩比Value:"+图片压缩比Value)
     device.keepScreenOn()
 
-    EinkRead.删除全部其他脚本()
-
     EinkRead.打开微信读书()
 
     EinkRead.进入书架界面()
@@ -261,20 +260,32 @@ function main(){
     log("choiceBookindex:"+choiceBookindex)
 
 
-    var 当前书籍名 = EinkRead.打开书籍(choiceBookindex)
+    while(连续获取书籍数量列表Value--){
 
-    EinkRead.跳转到首页(currentPage)
+
+        var 当前书籍名 = EinkRead.打开书籍(choiceBookindex)
+
+        EinkRead.跳转到首页(currentPage)
+        
     
+        var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
+    
+        EinkRead.打开截图权限()
+    
+        var tokenRes= baiduOCR.Get_token_Res()
+    
+        EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value)
 
-    var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
+        choiceBookindex++
+        EinkRead.进入书架界面()
 
-    EinkRead.打开截图权限()
+    }
 
-    var tokenRes= baiduOCR.Get_token_Res()
 
-    EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value)
     toastLog("截图完成退出")
     device.cancelKeepingAwake()
+    threads.shutDownAll();
+    engines.stopAll();
 
 }
 
@@ -289,4 +300,7 @@ var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
 var jsonUtil = require('jsonUtil.js');
 var dialogFile = require('dialogFile.js');
+
+EinkRead.删除全部其他脚本()
+initUiValue();
 //console.log("baiduocr token:", baiduOCR.Get_token_Res());
