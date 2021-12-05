@@ -236,6 +236,25 @@ EinkRead.保存一页图片 = function(dirName,imgType,currentPage,img,图片压
   log("正在截图中，保存页："+currentPage)
 }
 
+EinkRead.保存图片功能 = function(delayValue,currentPage,ocrcurrentPage,dirName,imgType,img,图片压缩比Value){
+  press(device.width-60,device.height-60,10)
+  sleep(delayValue*5)
+  if(currentPage == 0){
+      currentPage = ocrcurrentPage
+  } 
+  if(((ocrcurrentPage-currentPage)<=2) &&((ocrcurrentPage-currentPage)>=0)){
+    currentPage = ocrcurrentPage
+  }
+
+  EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
+  currentPage++
+  log("截图完后ocrcurrentPage:"+ocrcurrentPage)
+  //log("截图完后ocrendPage:"+ocrendPage)
+
+  return currentPage
+
+}
+
 EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,delayValue){
   log("开始截图")
   var imgType = "jpg"
@@ -244,9 +263,11 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
   var tempPage = 0
   var lastOcrValue = null
   var lastPage = 0
+
+  var 连续ocr失败计数 = 0
   while(ocrcurrentPage != ocrendPage){
       if(!className("android.view.ViewGroup").depth(15).desc("字体").id("uz").exists()){
-          if(!className("android.widget.TextView").depth(14).text("前路虽长，尤可期许").exists()){
+          if(!className("android.widget.TextView").depth(14).id("a2i").exists()){
 
            // if(className("android.widget.TextView").depth(16).text("全书完").exists())
 
@@ -261,6 +282,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
               var results = ocr.ocrImage(clip);
               log("results:"+results);
               log("lastOcrValue:"+lastOcrValue)
+              log("currentPage:"+currentPage)
 
             //   var results = ocr.detect(clip.getBitmap(),0.5)
             //   console.info("过滤前结果数："+results.size())
@@ -288,6 +310,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
               //if(result.words_result_num>0)
               if(results.success == true)
               {
+                  连续ocr失败计数 = 0
                   //var integralContent = result.words_result[0].words.split('/');
                   var integralContent = results.text.split('/');
                   if(integralContent.length>=2){
@@ -319,35 +342,37 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                         currentPage = currentPage-2
                     }
                     else{
-                      press(device.width-60,device.height-60,10)
-                      sleep(delayValue*5)
-                      if(currentPage == 0){
-                          currentPage = ocrcurrentPage
-                      } 
-                      if(((ocrcurrentPage-currentPage)<=2) &&((ocrcurrentPage-currentPage)>=0)){
-                        currentPage = ocrcurrentPage
-                      }
+                      currentPage = EinkRead.保存图片功能(delayValue,currentPage,ocrcurrentPage,dirName,imgType,img,图片压缩比Value)
+                      // press(device.width-60,device.height-60,10)
+                      // sleep(delayValue*5)
+                      // if(currentPage == 0){
+                      //     currentPage = ocrcurrentPage
+                      // } 
+                      // if(((ocrcurrentPage-currentPage)<=2) &&((ocrcurrentPage-currentPage)>=0)){
+                      //   currentPage = ocrcurrentPage
+                      // }
 
-                      EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
-                      currentPage++
-                      log("截图完后ocrcurrentPage:"+ocrcurrentPage)
-                      log("截图完后ocrendPage:"+ocrendPage)
+                      // EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
+                      // currentPage++
+                      // log("截图完后ocrcurrentPage:"+ocrcurrentPage)
+                      // log("截图完后ocrendPage:"+ocrendPage)
                     }
                   }
                   else{
                     if(lastOcrValue ==results.text){
                       lastOcrValue=null
-                      press(device.width-60,device.height-60,10)
-                      sleep(1000)
-                      if(currentPage == 0){
-                          currentPage = ocrcurrentPage
-                      }
-                      if(((ocrcurrentPage-currentPage)<=2)&&((ocrcurrentPage-currentPage)>=0)){
-                        currentPage = ocrcurrentPage
-                      }
-                      EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
-                      log("currentPage:"+currentPage)
-                      currentPage++
+                      currentPage = EinkRead.保存图片功能(delayValue,currentPage,ocrcurrentPage,dirName,imgType,img,图片压缩比Value)
+                      // press(device.width-60,device.height-60,10)
+                      // sleep(1000)
+                      // if(currentPage == 0){
+                      //     currentPage = ocrcurrentPage
+                      // }
+                      // if(((ocrcurrentPage-currentPage)<=2)&&((ocrcurrentPage-currentPage)>=0)){
+                      //   currentPage = ocrcurrentPage
+                      // }
+                      // EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
+                      // log("currentPage:"+currentPage)
+                      // currentPage++
                     }
                     log("currentPage2:"+currentPage)
                     
@@ -386,15 +411,26 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                   
               } 
               else{
+                log("未发现ocr数据 currentPage:"+currentPage)
+                log("未发现ocr数据 lastOcrValue:"+lastOcrValue)
                 log("未发现ocr数据，暂停中。。。")
+                连续ocr失败计数++
+                if(连续ocr失败计数 >=3){
+                  连续ocr失败计数 = 0
+                  currentPage = EinkRead.保存图片功能(delayValue,currentPage,ocrcurrentPage,dirName,imgType,img,图片压缩比Value)
+                }
                 sleep(1000)
                 
               }     
               
           }
+          else{
+            log("各间断底面弹窗提醒，暂停截图中。。。")
+            sleep(500)
+          }
       }
       else{
-          log("暂停截图中。。。")
+          log("有下框选择按钮出现，暂停截图中。。。")
           sleep(500)
       }
 
