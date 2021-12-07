@@ -21,6 +21,9 @@ var 自动获取书籍按钮Value = null;//BindVar-Create 获取内容按钮
 var 显示想法按钮Value = null;
 var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
 var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
+
+var 显示截图悬浮按钮Value = null
+
 var entries = "1|2|3|4|5"
 
 ui.layout(
@@ -68,6 +71,7 @@ ui.layout(
                         <checkbox id="显示想法按钮" text="显示想法" checked = "true"/>
                         <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
                         <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/>
+                        <checkbox id="显示截图悬浮按钮" text="显示截图悬浮窗" checked = "true"/>
                         
                         {/* <text textSize="16sp" textColor="black" text="需要截图的书籍页数"/>
                         <input id="书籍截图总页数" text="99999" inputType="number"/> */}
@@ -172,12 +176,14 @@ function initUiValue(){
     ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
     ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
     ui.显示想法按钮.setChecked(uiStorage.get("显示想法按钮",false));
+    ui.显示截图悬浮按钮.setChecked(uiStorage.get("显示截图悬浮按钮",false));
 
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
     获取内容按钮Value = ui.获取内容按钮.checked;
     获取目录按钮Value = ui.获取目录按钮.checked;
     显示想法按钮Value = ui.显示想法按钮.checked;
+    显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
 
     连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
     图片压缩比Value = ui.图片压缩比.getProgress();
@@ -196,6 +202,7 @@ function saveUiValue(){
     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
+    uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
     
 }
 
@@ -223,6 +230,11 @@ ui.获取目录按钮.on("check",(checked)=>{
 ui.显示想法按钮.on("check",(checked)=>{
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
     显示想法按钮Value = ui.显示想法按钮.checked;
+});
+
+ui.显示截图悬浮按钮.on("check",(checked)=>{
+    uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
+    显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
 });
 
 ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
@@ -314,4 +326,69 @@ var dialogFile = require('dialogFile.js');
 
 EinkRead.删除全部其他脚本()
 initUiValue();
+
+threads.start(function() {
+    var window = floaty.window(
+        <frame>
+            <vertical padding="18 8" h="auto">
+                <button id="action" text="开始运行" w="90" h="40" bg="#77ffffff"/>
+                <button id="action2" text="打开设置界面" w="90" h="40" bg="#77ffffff"/>
+            </vertical>
+            
+        </frame>
+    )
+    setInterval(() => {}, 1000);
+    var execution = null;
+    
+    //记录按键被按下时的触摸坐标
+    var x = 0,
+        y = 0;
+    //记录按键被按下时的悬浮窗位置
+    var windowX, windowY;
+    //记录按键被按下的时间以便判断长按等动作
+    var downTime;
+    
+    window.action.setOnTouchListener(function(view, event) {
+        switch (event.getAction()) {
+            case event.ACTION_DOWN:
+                x = event.getRawX();
+                y = event.getRawY();
+                windowX = window.getX();
+                windowY = window.getY();
+                downTime = new Date().getTime();
+                return true;
+            case event.ACTION_MOVE:
+                //移动手指时调整悬浮窗位置
+                window.setPosition(windowX + (event.getRawX() - x),
+                    windowY + (event.getRawY() - y));
+                //如果按下的时间超过1.5秒判断为长按，退出脚本
+                if (new Date().getTime() - downTime > 1500) {
+                    exit();
+                }
+                return true;
+            case event.ACTION_UP:
+                //手指弹起时如果偏移很小则判断为点击
+                if (Math.abs(event.getRawY() - y) < 5 && Math.abs(event.getRawX() - x) < 5) {
+                    onClick();
+                }
+                return true;
+        }
+        return true;
+    });
+    
+    function onClick() {
+        if (window.action.getText() == '开始运行') {
+            execution = engines.execScriptFile(path);
+            window.action.setText('停止运行');
+        } else {
+            if (execution) {
+                execution.getEngine().forceStop();
+            }
+            window.action.setText('开始运行');
+        }
+    }
+    })
+// setTimeout(()=>{
+//     window.close();
+// }, 2000);
 //console.log("baiduocr token:", baiduOCR.Get_token_Res());
