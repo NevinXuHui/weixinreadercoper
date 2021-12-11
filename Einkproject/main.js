@@ -1,15 +1,26 @@
-
+auto();
 var path = "./main_copy.js"
 var EinkRead = require('EinkRead.js');
 EinkRead.删除全部其他脚本()
 
+var  书籍选择触摸坐标=null 
+var  书架列表 = null
+
 var 书架页切换标志 = false
 //启用触摸监听
 events.observeTouch();
+events.setTouchEventTimeout(30)
 //注册触摸监听器
-events.onTouch(function(p){
-    //触摸事件发生时, 打印出触摸的点的坐标
-    log(p.x + ", " + p.y);
+events.on("touch",function(p){
+   // 触摸事件发生时, 打印出触摸的点的坐标
+    // if("com.tencent.weread.eink" == currentPackage() && 
+    // ("com.tencent.weread.WeReadFragmentActivity" == currentActivity())&&
+    // (className("android.view.ViewGroup").depth(14).id("a0m").exists())){
+    //     书籍选择触摸坐标 = p
+    //     log("获取书籍选择坐标:"+p.x + ", " + p.y);
+    // }
+    toastLog("获取书籍选择坐标:"+p.x + ", " + p.y)
+    
 });
 
 threads.start(function() {
@@ -30,11 +41,51 @@ threads.start(function() {
                     log("当前在书架页")
                     if(书架页切换标志 == true){
                         书架页切换标志 = false
-                        log("获取书籍列表:"+EinkRead.获取书架列表())
+                        书架列表 = EinkRead.获取书架列表()
+                        log("获取书籍列表:"+书架列表)
                     }
         }
         else{
+
             书架页切换标志 = true
+            if("com.tencent.weread.eink" == currentPackage() && 
+            ("com.tencent.weread.ReaderFragmentActivity" == currentActivity())){
+                
+                var localX = 0
+                var localY = 0
+                var XNum = 0
+                var YNum = 0
+                var i = 0
+                while(书架列表[i][1].left<书架列表[i+1][1].left){
+                    i++
+                }
+                XNum = i+1
+                YNum = 书架列表.length /XNum
+
+                log("书籍有"+XNum+"列  "+"有"+YNum+"行")
+
+                i = 0
+                while(书架列表[i][1].left<书籍选择触摸坐标.x){
+                    i++
+                }
+                localX = i
+
+                i = 0
+                while(书架列表[i*XNum][1].top<书籍选择触摸坐标.y){
+                    log("书籍选择触摸坐标.y:"+书籍选择触摸坐标.y)
+                    log("书架列表[i*XNum][1].top:"+书架列表[i*XNum][1].top)
+                    log("i:"+i)
+                    i++
+                }
+                localY = i
+
+                log("localX:"+localX)
+                log("localY:"+localY)
+
+                log("书籍选择坐标："+"x="+书籍选择触摸坐标.x+"y="+书籍选择触摸坐标.y)
+                log("第二本坐标"+书架列表[1][1].left+","+书架列表[1][1].right+","+书架列表[1][1].top+","+书架列表[1][1].bottom)
+
+        }
         }
     }, 1000);
 

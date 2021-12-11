@@ -452,18 +452,20 @@ EinkRead.获取书架列表 = function(){
     var bookList = []
     var 书架列表 = className("android.widget.RelativeLayout").depth(16).clickable().find()
     书架列表.forEach(function(item, index){
+        bookList = []
         item.children().forEach(function(item2, index2){
             if(item2.className()=="android.widget.TextView"){
-                log(item2.text().replace(/\[icon\]/ig,""))
-
-
-                
-                bookNameList.push(item2.text().replace(/\[icon\]/ig,""))
+              //  log(item2.text().replace(/\[icon\]/ig,""))
+                bookList.push(item2.text().replace(/\[icon\]/ig,""))
+                bookList.push(item2.parent().bounds())
+                bookinfoList.push(bookList)
+               // log("控件在屏幕上的范围:"+item2.parent().bounds())
             }
         })
     })
+    log(bookinfoList)
     log("获取书架数据成功")
-    return bookNameList
+    return bookinfoList
 }
 
 module.exports = EinkRead;
