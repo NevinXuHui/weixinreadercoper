@@ -1,29 +1,26 @@
 auto();
 var path = "./main_copy.js"
 var EinkRead = require('EinkRead.js');
-EinkRead.删除全部其他脚本()
+
+EinkRead.删除全部其他脚本(engines.myEngine())
 
 var  书籍选择触摸坐标=null 
 var  书架列表 = null
 
 var 书架页切换标志 = false
+
 //启用触摸监听
-events.observeTouch();
-events.setTouchEventTimeout(30)
+events.observeTouch()
 //注册触摸监听器
-events.on("touch",function(p){
-   // 触摸事件发生时, 打印出触摸的点的坐标
-    // if("com.tencent.weread.eink" == currentPackage() && 
-    // ("com.tencent.weread.WeReadFragmentActivity" == currentActivity())&&
-    // (className("android.view.ViewGroup").depth(14).id("a0m").exists())){
-    //     书籍选择触摸坐标 = p
-    //     log("获取书籍选择坐标:"+p.x + ", " + p.y);
-    // }
-    toastLog("获取书籍选择坐标:"+p.x + ", " + p.y)
-    
-});
+events.onTouch(function(p){
+    //触摸事件发生时, 打印出触摸的点的坐标
+    log(p.x + ", " + p.y)
+})
 
 threads.start(function() {
+
+
+
     var window = floaty.window(
         <frame>
             <horizontal padding="18 8" h="auto">
@@ -33,8 +30,8 @@ threads.start(function() {
         </frame>
     )
     setInterval(() => {
-        log("当前包名："+currentPackage())
-        log("当前活动："+currentActivity())
+        log("主进程当前包名："+currentPackage())
+        log("主进程当前活动："+currentActivity())
         if("com.tencent.weread.eink" == currentPackage() && 
             ("com.tencent.weread.WeReadFragmentActivity" == currentActivity())&&
             (className("android.view.ViewGroup").depth(14).id("a0m").exists())){
@@ -89,7 +86,7 @@ threads.start(function() {
         }
     }, 1000);
 
-    window.setPosition(device.width*3/4,device.height/2)
+    window.setPosition(device.width/2,device.height/2)
 
     var execution = null;
     
@@ -115,7 +112,7 @@ threads.start(function() {
                 window.setPosition(windowX + (event.getRawX() - x),
                     windowY + (event.getRawY() - y));
                 //如果按下的时间超过1.5秒判断为长按，退出脚本
-                if (new Date().getTime() - downTime > 3000) {
+                if (new Date().getTime() - downTime > 2000) {
                     log("长按时间超过3s，退出程序")
                     threads.shutDownAll();
                     engines.stopAll();
@@ -146,8 +143,10 @@ threads.start(function() {
                 window.setPosition(windowX + (event.getRawX() - x),
                     windowY + (event.getRawY() - y));
                 //如果按下的时间超过1.5秒判断为长按，退出脚本
-                if (new Date().getTime() - downTime > 3000) {
+                if (new Date().getTime() - downTime > 2000) {
                     log("长按时间超过3s，退出程序")
+                    threads.shutDownAll();
+                    engines.stopAll();
                     exit();
                 }
                 return true;
@@ -163,8 +162,8 @@ threads.start(function() {
 
     
     function onClick() {
-        log("当前包名："+currentPackage())
-        log("当前活动："+currentActivity())
+        log("onclick当前包名："+currentPackage())
+        log("onclick当前活动："+currentActivity())
         if("com.tencent.weread.ReaderFragmentActivity"!=currentActivity()){
              toastLog("截图失败，不在微信读书界面")
         }
@@ -197,7 +196,4 @@ threads.start(function() {
          }
     }
     })
-// setTimeout(()=>{
-//     window.close();
-// }, 2000);
-//console.log("baiduocr token:", baiduOCR.Get_token_Res());
+

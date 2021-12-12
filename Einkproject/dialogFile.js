@@ -27,7 +27,14 @@ dialogFile.thelist = function(str) {
 }
 
 
-dialogFile.下载数据选择对话框 = function(bookNameList){
+dialogFile.下载数据选择对话框 = function(bookList){
+
+    var bookNamneList = null
+
+    for(var i = 0;i<bookList.length;i++){
+        bookNamneList.append(bookList[i][0])
+    }
+
     var choiceBookindex = null
     var lock = threads.lock()
     var complete = lock.newCondition()

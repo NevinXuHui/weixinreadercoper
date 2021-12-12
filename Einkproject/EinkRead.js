@@ -85,9 +85,8 @@ EinkRead.获取目录 = function(dirName,flag){
 
 }
 
-EinkRead.删除全部其他脚本 = function(){
+EinkRead.删除全部其他脚本 = function(当前脚本){
   var 所有脚本=engines.all()
-  var 当前脚本 = engines.myEngine();
   for(let i = 0;i<所有脚本.length;i++){
       var 删除脚本=所有脚本.pop()
       log("删除脚本:"+删除脚本)
@@ -101,11 +100,13 @@ EinkRead.删除全部其他脚本 = function(){
 
 EinkRead.打开微信读书 = function(){
   log("微信读书打开成功状态："+app.launch("com.tencent.weread.eink"))
-  while("com.tencent.weread.eink"!=currentPackage()){
-      sleep(200)
+  while("com.tencent.weread.eink"!=currentPackage()&&("com.tencent.weread.WeReadFragmentActivity"!=currentActivity())&&("com.tencent.weread.ReaderFragmentActivity"!=currentActivity())){
+      sleep(1000)
+      log("当前包名2："+currentPackage())
+      log("当前活动2："+currentActivity())
   }
-  log("当前包名："+currentPackage())
-  log("当前活动："+currentActivity())
+  log("当前包名2："+currentPackage())
+  log("当前活动2："+currentActivity())
 }
 
 EinkRead.进入书架界面 = function(){
@@ -132,36 +133,40 @@ EinkRead.进入书架界面 = function(){
 }
 
 EinkRead.打开书籍 = function(choiceBookindex){
-  var 当前书籍名 = className("android.widget.TextView").depth(17).id("d8").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
-  className("android.widget.RelativeLayout").depth(17).findOnce(choiceBookindex).parent().click()
+  var 当前书籍名 = className("android.widget.TextView").depth(15).id("book_grid_item_name").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
+  className("android.widget.RelativeLayout").depth(14).findOnce(choiceBookindex).click()
   log("当前书籍名："+当前书籍名)
   return 当前书籍名
 }
 
 EinkRead.设置为已下载模式 = function(){
-  while(!className("android.widget.TextView").depth(16).text("已下载").exists()){
+  while(!className("android.widget.TextView").depth(14).text("已下载").exists()){
+    log("书籍下载未完成")
     sleep(500)
   }
+  log("设置为已下载模式")
 
 }
 
 EinkRead.显示想法设置 = function(显示想法按钮Value){
   if(显示想法按钮Value == true){
-    while(!className("android.widget.TextView").depth(16).text("已显示想法").exists()){
-      if(className("android.widget.TextView").depth(16).text("显示想法").exists()){
-        className("android.view.ViewGroup").depth(15).id("we").findOnce().click()
+    while(!className("android.widget.TextView").depth(14).text("隐藏想法").exists()){
+      if(className("android.widget.TextView").depth(14).text("显示想法").exists()){
+        className("android.view.ViewGroup").depth(13).id("reader_top_review").findOnce().click()
         sleep(2000)
       }
       sleep(500)
     }
+    log("设置为显示想法")
   }else{
-    while(!className("android.widget.TextView").depth(16).text("显示想法").exists()){
-      if(className("android.widget.TextView").depth(16).text("已显示想法").exists()){
-        className("android.view.ViewGroup").depth(15).id("we").findOnce().click()
+    while(!className("android.widget.TextView").depth(14).text("显示想法").exists()){
+      if(className("android.widget.TextView").depth(14).text("隐藏想法").exists()){
+        className("android.view.ViewGroup").depth(13).id("reader_top_review").findOnce().click()
         sleep(2000)
       }
       sleep(500)
     }
+    log("设置为不显示想法")
   }
 
 }
@@ -170,9 +175,11 @@ EinkRead.显示想法设置 = function(显示想法按钮Value){
 EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value){
   
       while(!className("android.widget.TextView").text("进度").exists()){
+        log("不存在进度按钮")
           log("当前包名："+currentPackage())
           log("当前活动："+currentActivity())
           if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
+            log("触发进度按钮")
              // swipe(device.width/2, device.height/2,device.width/2,device.height*3/8,50)
               click(device.width/2, device.height/2)
               sleep(500)
@@ -184,14 +191,14 @@ EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value){
       
 
 
-      while(!className("android.widget.ImageButton").depth(15).id("vk").exists()){
-          className("android.widget.TextView").text("进度").depth(16).findOnce().parent().click()
+      while(!className("android.widget.ImageButton").depth(13).id("reader_previous_chapter").exists()){
+          className("android.widget.TextView").text("进度").depth(14).findOnce().parent().click()
           sleep(200)
       }
       log("进入微信读书书本进度条页面")
       if(currentPage == 1){
-        swipe((className("android.widget.FrameLayout").depth(16).findOnce().bounds().left+className("android.widget.FrameLayout").depth(16).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(15).findOnce().bounds().top+className("android.widget.FrameLayout").depth(15).findOnce().bounds().bottom)/2, 
-        className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().left, className("android.widget.FrameLayout").depth(15).id("vi").findOnce().bounds().top, 100)
+        swipe((className("android.widget.FrameLayout").depth(14).findOnce().bounds().left+className("android.widget.FrameLayout").depth(14).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(14).findOnce().bounds().top+className("android.widget.FrameLayout").depth(14).findOnce().bounds().bottom)/2, 
+        className("android.widget.FrameLayout").depth(13).id("reader_page_rangebar").findOnce().bounds().left, className("android.widget.FrameLayout").depth(13).id("reader_page_rangebar").findOnce().bounds().top, 100)
         sleep(200)
         log("进入书籍首页")
       }
@@ -266,8 +273,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
   var 连续ocr失败计数 = 0
   while(ocrcurrentPage != ocrendPage){
-      if(!className("android.view.ViewGroup").depth(15).desc("字体").id("uz").exists()){
-          if(!className("android.widget.TextView").depth(14).id("a2i").exists()){
+      if(!className("android.view.ViewGroup").depth(13).desc("字体").id("reader_font").exists()){
+          if(!className("android.widget.TextView").depth(12).id("text_first_line_view").exists()){
 
            // if(className("android.widget.TextView").depth(16).text("全书完").exists())
 
@@ -322,7 +329,7 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                     log("ocrendPage:"+ocrendPage)
                   //最后一页
                     
-                    if(className("android.widget.TextView").depth(16).text("全书完").exists()){
+                    if(className("android.widget.TextView").depth(14).text("全书完").exists()){
                       ocrendPage = ocrcurrentPage
                       currentPage = ocrcurrentPage                      
                       EinkRead.获取目录(dirName,1)

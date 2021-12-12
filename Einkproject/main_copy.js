@@ -324,7 +324,7 @@ var baiduOCR = require('baiduOCR.js');
 var jsonUtil = require('jsonUtil.js');
 var dialogFile = require('dialogFile.js');
 
-EinkRead.删除全部其他脚本()
+EinkRead.删除全部其他脚本(engines.myEngine())
 initUiValue();
 
 // threads.start(function() {
