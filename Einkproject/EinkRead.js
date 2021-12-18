@@ -26,9 +26,12 @@ EinkRead.获取目录 = function(dirName,flag){
           sleep(200)
       }
   }
+  log("显示目录按钮")
+
   //显示目录页面
-  while(!className("androidx.recyclerview.widget.RecyclerView").depth(17).exists()){
-      className("android.widget.TextView").text("目录").depth(16).findOnce().parent().click()
+  while(!className("android.widget.TextView").depth(16).id("chapter_page_number").exists()){
+      className("android.widget.TextView").text("目录").depth(14).findOnce().parent().click()
+      log("点击目录按钮")
       sleep(200)
   }
   log("进入微信读书目录页面")
@@ -36,8 +39,10 @@ EinkRead.获取目录 = function(dirName,flag){
   let lastPageDataList = [];
 
   if(flag == 1){
-      if(className("android.widget.TextView").depth(17).text("去顶部").exists()){
-          className("android.widget.TextView").depth(17).text("去顶部").findOnce().parent().click()
+
+      if(className("android.widget.TextView").text("去顶部").exists()){
+          className("android.widget.TextView").text("去顶部").findOnce().parent().click()
+          log("点击去顶部")
           sleep(500)
       }
       log("回到顶部")
@@ -45,7 +50,7 @@ EinkRead.获取目录 = function(dirName,flag){
   var 到底部标志 = 0
   while(到底部标志<2){
       let pageDataList = [];
-      className("androidx.recyclerview.widget.RecyclerView").findOnce().children().forEach(function(child1){
+      className("androidx.recyclerview.widget.RecyclerView").depth(14).findOnce(1).children().forEach(function(child1){
           let dataList = [];
           child1.children().forEach(function(child2,index){
               dataList[index]=child2.text()
@@ -68,9 +73,9 @@ EinkRead.获取目录 = function(dirName,flag){
       pageDataList.forEach(function(item) {
           目录文件.writeline(item);
       });
-      className("android.view.ViewGroup").id("fm").depth(15).findOnce().click()
+      className("android.view.ViewGroup").id("bottombar_next").depth(13).findOnce().click()
       sleep(100)
-      if(className("android.widget.TextView").depth(17).text("去顶部").exists()){
+      if(className("android.widget.TextView").depth(15).text("去顶部").exists()){
           到底部标志++
       }
   }
@@ -79,7 +84,7 @@ EinkRead.获取目录 = function(dirName,flag){
   目录文件.close();
   log("目录获取完成")
   
-  click(className("android.widget.TextView").text("目录").depth(16).findOnce().bounds().left,className("android.widget.TextView").text("目录").depth(16).findOnce().bounds().top)
+  click(className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().left,className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().top)
   click(device.width/2, device.height/2)
   sleep(200)
 
