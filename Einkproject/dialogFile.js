@@ -29,10 +29,12 @@ dialogFile.thelist = function(str) {
 
 dialogFile.下载数据选择对话框 = function(bookList){
 
-    var bookNamneList = null
+    var bookNameList = []
 
     for(var i = 0;i<bookList.length;i++){
-        bookNamneList.append(bookList[i][0])
+        log("bookList[i][0]:"+bookList[i][0])
+        log("i:"+i)
+        bookNameList.push(bookList[i][0])
     }
 
     var choiceBookindex = null

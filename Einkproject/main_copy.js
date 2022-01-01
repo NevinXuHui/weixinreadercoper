@@ -24,6 +24,9 @@ var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
 
 var 显示截图悬浮按钮Value = null
 
+var 截图应用微信读书按钮Value = null
+var 截图应用微信读书Eink按钮Value = null
+
 var entries = "1|2|3|4|5"
 
 ui.layout(
@@ -60,6 +63,12 @@ ui.layout(
                 cardElevation="1dp" gravity="center_vertical">
                 <ScrollView>
                     <vertical padding="18 8" h="auto">
+                        <text text="选择截图App" textColor="#222222"/>
+                        <radiogroup>
+                            <radio id="微信读书按钮" text="微信读书"/>
+                            <radio id="微信读书Eink按钮" text="微信读书Eink" checked = "true"/>
+                        </radiogroup>
+
                         <text text="连续获取书籍数量" textColor="#222222"/>
                         <spinner id="连续获取书籍数量列表" entries="{{entries}}"/>
                         <seekbar id="图片压缩比"/>
@@ -69,8 +78,8 @@ ui.layout(
                         <text text="下载功能选择：" textColor="#222222"/>
                         <checkbox id="自动获取书籍按钮" text="自动获取书籍" checked = "true"/>
                         <checkbox id="显示想法按钮" text="显示想法" checked = "true"/>
-                        <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
-                        <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/>
+                        {/* <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
+                        <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/> */}
                         <checkbox id="显示截图悬浮按钮" text="显示截图悬浮窗" checked = "true"/>
                         
                         {/* <text textSize="16sp" textColor="black" text="需要截图的书籍页数"/>
@@ -82,15 +91,15 @@ ui.layout(
                         <text textSize="16sp" textColor="black" text="是否进行从头开始截图"/>
                         <checkbox id="内容从头开始截图按钮" text="是" checked = "true" marginTop="5"/>
                         
-                        <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
+                        {/* <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
                         <checkbox id="删除书籍按钮" text="是" checked = "false" marginTop="5"/>
 
                         <text textSize="16sp" textColor="black" text="书籍离线预下载"/>
-                        <checkbox id="书籍离线预下载按钮" text="是" checked = "false" marginTop="5"/>
+                        <checkbox id="书籍离线预下载按钮" text="是" checked = "false" marginTop="5"/> */}
                         {/* <text textSize="16sp" textColor="black" text="需要离线下载的书籍数量" /> */}
                         {/* <input id="离线下载书籍数量" text="10" inputType="number" />  */}
                                    
-                        <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/>
+                        {/* <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/> */}
                         
                     </vertical>
                 </ScrollView>
@@ -173,17 +182,24 @@ function initUiValue(){
     ui.连续获取书籍数量列表.setSelection(uiStorage.get("连续获取书籍数量",0));
     ui.内容从头开始截图按钮.setChecked(uiStorage.get("内容从头开始截图按钮",false));
     ui.自动获取书籍按钮.setChecked(uiStorage.get("自动获取书籍按钮",false));
-    ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
-    ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
+    // ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
+    // ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
     ui.显示想法按钮.setChecked(uiStorage.get("显示想法按钮",false));
     ui.显示截图悬浮按钮.setChecked(uiStorage.get("显示截图悬浮按钮",false));
+    
+    ui.微信读书按钮.setChecked(uiStorage.get("微信读书按钮",false));
+    ui.微信读书Eink按钮.setChecked(uiStorage.get("微信读书Eink按钮",false));
+
 
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
-    获取内容按钮Value = ui.获取内容按钮.checked;
-    获取目录按钮Value = ui.获取目录按钮.checked;
+    // 获取内容按钮Value = ui.获取内容按钮.checked;
+    // 获取目录按钮Value = ui.获取目录按钮.checked;
     显示想法按钮Value = ui.显示想法按钮.checked;
     显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
+
+    截图应用微信读书按钮Value =ui.微信读书按钮.checked
+    截图应用微信读书Eink按钮Value =ui.微信读书Eink按钮.checked
 
     连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
     图片压缩比Value = ui.图片压缩比.getProgress();
@@ -199,10 +215,13 @@ function saveUiValue(){
     uiStorage.put("连续获取书籍数量",ui.连续获取书籍数量列表.getSelectedItemPosition());
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
-    uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
-    uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
+    // uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
+    // uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
     uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
+    uiStorage.put("微信读书按钮",ui.微信读书按钮.checked);
+    uiStorage.put("微信读书Eink按钮",ui.微信读书Eink按钮.checked);
+
     
 }
 
@@ -216,16 +235,16 @@ ui.自动获取书籍按钮.on("check",(checked)=>{
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
 
 });
-//Bind-Connect 获取内容按钮
-ui.获取内容按钮.on("check",(checked)=>{
-    uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
-    获取内容按钮Value = ui.获取内容按钮.checked;
-});
-//Bind-Connect 获取目录按钮
-ui.获取目录按钮.on("check",(checked)=>{
-    uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
-    获取目录按钮Value = ui.获取目录按钮.checked;
-});
+// //Bind-Connect 获取内容按钮
+// ui.获取内容按钮.on("check",(checked)=>{
+//     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
+//     获取内容按钮Value = ui.获取内容按钮.checked;
+// });
+// //Bind-Connect 获取目录按钮
+// ui.获取目录按钮.on("check",(checked)=>{
+//     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
+//     获取目录按钮Value = ui.获取目录按钮.checked;
+// });
 
 ui.显示想法按钮.on("check",(checked)=>{
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
@@ -236,6 +255,24 @@ ui.显示截图悬浮按钮.on("check",(checked)=>{
     uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
     显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
 });
+
+ui.微信读书按钮.on("check",(checked)=>{
+    uiStorage.put("微信读书按钮",ui.微信读书按钮.checked);
+    截图应用微信读书按钮Value = ui.微信读书按钮.checked;
+
+    uiStorage.put("微信读书Eink按钮",false);
+    截图应用微信读书Eink按钮Value = false;
+});
+
+ui.微信读书Eink按钮.on("check",(checked)=>{
+    uiStorage.put("微信读书Eink按钮",ui.微信读书Eink按钮.checked);
+    截图应用微信读书Eink按钮Value = ui.微信读书Eink按钮.checked;
+
+    uiStorage.put("微信读书按钮",false);
+    截图应用微信读书按钮Value = false;
+});
+
+
 
 ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
     // 测试列表Value = ui.测试列表.getSelectedItemPosition();
@@ -258,6 +295,16 @@ ui.翻页延时.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({
 
 function main(){
 
+    if(截图应用微信读书按钮Value == true){
+        var 截图应用 = "微信应用"
+    }
+    else if(截图应用微信读书Eink按钮Value == true){
+        var 截图应用 = "微信Eink应用"
+    }
+    else{
+        var 截图应用 =null
+    }
+
     if(内容从头开始截图按钮Value == true){
         var currentPage = 1
     }else{
@@ -270,26 +317,34 @@ function main(){
     log("图片压缩比Value:"+图片压缩比Value)
     device.keepScreenOn()
 
-    EinkRead.打开微信读书()
+    EinkRead.打开微信读书(截图应用)
 
-    EinkRead.进入书架界面()
+    EinkRead.进入书架界面(截图应用)
 
     if(自动获取书籍按钮Value == true){
         var choiceBookindex = 0
     }else{
-        var bookNameList = EinkRead.获取书架列表()
+        var bookNameList = EinkRead.获取书架列表(截图应用)
         var choiceBookindex = dialogFile.下载数据选择对话框(bookNameList)
     }
 
     log("choiceBookindex:"+choiceBookindex)
 
 
+
     while(连续获取书籍数量列表Value--){
 
 
-        var 当前书籍名 = EinkRead.打开书籍(choiceBookindex)
+        var 当前书籍名 = EinkRead.打开书籍(choiceBookindex,截图应用)
 
-        EinkRead.跳转到首页(currentPage,显示想法按钮Value)
+        
+
+        EinkRead.跳转到首页(currentPage,显示想法按钮Value,截图应用)
+
+        // while(1){
+        //     sleep(1000)
+        //     log("暂停")
+        //   }
         
         var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
     
@@ -297,7 +352,7 @@ function main(){
     
         var tokenRes= baiduOCR.Get_token_Res()
     
-        EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value)
+        EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value,截图应用)
 
         choiceBookindex++
         EinkRead.进入书架界面()
