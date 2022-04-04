@@ -19,8 +19,6 @@ events.onTouch(function(p){
 
 threads.start(function() {
 
-
-
     var window = floaty.window(
         <frame>
             <horizontal padding="18 8" h="auto">

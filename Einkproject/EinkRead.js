@@ -198,6 +198,14 @@ EinkRead.设置为已下载模式 = function(){
 }
 
 EinkRead.显示想法设置 = function(显示想法按钮Value){
+
+  while(!className("android.widget.TextView").depth(14).text("书友笔记").exists()){
+    log("未找到书记笔记按钮")
+    sleep(1000)
+  }
+  className("android.widget.TextView").depth(14).text("书友笔记").findOnce().parent().click()
+
+
   if(显示想法按钮Value == true){
     while(!className("android.widget.TextView").depth(14).text("隐藏想法").exists()){
       if(className("android.widget.TextView").depth(14).text("显示想法").exists()){
@@ -272,7 +280,7 @@ EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value,截图�
         }
     }
     EinkRead.设置为已下载模式()
-    EinkRead.显示想法设置(显示想法按钮Value)
+   // EinkRead.显示想法设置(显示想法按钮Value)
    
    while(!className("android.widget.ImageButton").depth(13).id("reader_previous_chapter").exists()){
        className("android.widget.TextView").text("进度").depth(14).findOnce().parent().click()

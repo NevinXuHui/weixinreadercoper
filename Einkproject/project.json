@@ -8,7 +8,7 @@
       "splashText": "Powered by Auto.js Pro",
       "stableMode": false
     },
-    "main": "main.js",
+    "main": "main_copy.js",
     "name": "My Project",
     "optimization": {
       "removeOpenCv": false,
