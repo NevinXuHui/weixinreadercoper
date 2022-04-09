@@ -86,8 +86,9 @@ EinkRead.获取目录 = function(dirName,flag){
   log("目录获取完成")
   
   click(className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().left,className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().top)
-  click(device.width/2, device.height/2)
   sleep(200)
+  // click(device.width/2, device.height/2)
+  // sleep(200)
 
 }
 
@@ -433,13 +434,19 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                     
                     if(className("android.widget.TextView").depth(14).text("全书完").exists()){
                       ocrendPage = ocrcurrentPage
-                      currentPage = ocrcurrentPage                      
+                      currentPage = ocrcurrentPage    
+
+                      EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
+                      
+                      // currentPage = EinkRead.保存图片功能(delayValue,currentPage,ocrcurrentPage,dirName,imgType,img,图片压缩比Value)
+                      
                       EinkRead.获取目录(dirName,1)
                       log("获取了全书完文字后获取目录成功")
                       log("获取目录后ocrcurrentPage:"+ocrcurrentPage)
                       log("获取目录后ocrendPage:"+ocrendPage)
 
                       className("android.view.ViewGroup").id("reader_bottom_back_button").depth(13).desc("返回").findOnce().click()
+                      break
 
                     }else if(ocrcurrentPage == ocrendPage ){
                       if(currentPage == ocrcurrentPage){
