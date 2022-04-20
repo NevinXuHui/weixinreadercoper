@@ -116,7 +116,7 @@ EinkRead.打开微信读书 = function(截图应用){
       log("当前活动2："+currentActivity())
     }
   }
-  else if(截图应用 == "微信Eink应用"){
+  else if(截图应用 == "微信Eink应用"){   
     log("微信读书打开成功状态："+app.launch("com.tencent.weread.eink"))
     while("com.tencent.weread.eink"!=currentPackage()&&("com.tencent.weread.WeReadFragmentActivity"!=currentActivity())&&("com.tencent.weread.ReaderFragmentActivity"!=currentActivity())){
       sleep(1000)
@@ -127,8 +127,6 @@ EinkRead.打开微信读书 = function(截图应用){
   sleep(500)
   log("当前包名2："+currentPackage())
   log("当前活动2："+currentActivity())
-
-
 
 
 }
@@ -364,6 +362,14 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
   var lastOcrValue = null
   var lastPage = 0
 
+//   app.startActivity({
+//     packageName: "com.hzc.picker",
+//     className: "com.hzc.picker.MainActivity",
+//     extras:{"extra_data":dirName
+//     },
+//     root: true
+// });
+
   var 连续ocr失败计数 = 0
   while(ocrcurrentPage != ocrendPage){
 
@@ -446,6 +452,15 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
                       log("获取目录后ocrendPage:"+ocrendPage)
 
                       className("android.view.ViewGroup").id("reader_bottom_back_button").depth(13).desc("返回").findOnce().click()
+
+                      app.startActivity({
+                        packageName: "com.hzc.picker",
+                        className: "com.hzc.picker.MainActivity",
+                        extras:{"extra_data":dirName
+                        },
+                        root: true
+                    });
+
                       break
 
                     }else if(ocrcurrentPage == ocrendPage ){
