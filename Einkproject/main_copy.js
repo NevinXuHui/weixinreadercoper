@@ -2,6 +2,7 @@
 importClass(android.widget.AdapterView);
 importClass(android.widget.SeekBar);
 importClass(java.io.File);
+
 //导入插件
 //var ocr = $plugins.load("com.hraps.ocr")
 var OCR = $plugins.load('org.autojs.plugin.ocr');
@@ -10,22 +11,23 @@ $events.on('exit', () => {
     ocr.end();
 });
 
-var 连续获取书籍数量列表Value = null
-var 图片压缩比Value = 0;
-var 翻页延时时间Value = 0;
+var 连续获取书籍数量列表Value = 1
+
+var 图片压缩比Value = 15;
+var 翻页延时时间Value = 40;
 
 var 内容从头开始截图按钮Value = null;//BindVar-Create 内容从头开始截图按钮
 
 var 自动获取书籍按钮Value = null;//BindVar-Create 获取内容按钮
 
 var 显示想法按钮Value = null;
-var 获取内容按钮Value = null;//BindVar-Create 获取内容按钮
-var 获取目录按钮Value = null;//BindVar-Create 获取目录按钮
 
 var 显示截图悬浮按钮Value = null
 
+var 书籍目录包含日期按钮Value = null
+
 var 截图应用微信读书按钮Value = null
-var 截图应用微信读书Eink按钮Value = null
+var 截图应用微信读书Eink按钮Value = true
 
 var entries = "1|2|3|4|5"
 
@@ -72,34 +74,19 @@ ui.layout(
                         <text text="连续获取书籍数量" textColor="#222222"/>
                         <spinner id="连续获取书籍数量列表" entries="{{entries}}"/>
                         <seekbar id="图片压缩比"/>
-                        <text text="当前图片压缩比20%" id="当前图片压缩比显示值" textColor="#222222"/>
+                        <text text="当前图片压缩比:20%" id="当前图片压缩比显示值" textColor="#222222"/>
                         <seekbar id="翻页延时"/>
-                        <text text="当前翻页延时100ms" id="当前翻页延时显示值" textColor="#222222"/>
+                        <text text="当前翻页延时:100ms" id="当前翻页延时显示值" textColor="#222222"/>
                         <text text="下载功能选择：" textColor="#222222"/>
                         <checkbox id="自动获取书籍按钮" text="自动获取书籍" checked = "true"/>
                         <checkbox id="显示想法按钮" text="显示想法" checked = "true"/>
-                        {/* <checkbox id="获取目录按钮" text="获取目录" checked = "true"/>
-                        <checkbox id="获取内容按钮" text="获取内容" checked = "true" marginTop="5"/> */}
+
                         <checkbox id="显示截图悬浮按钮" text="显示截图悬浮窗" checked = "true"/>
+                        <checkbox id="书籍目录包含日期按钮" text="书籍目录包含日期" checked = "true"/>
                         
-                        {/* <text textSize="16sp" textColor="black" text="需要截图的书籍页数"/>
-                        <input id="书籍截图总页数" text="99999" inputType="number"/> */}
-                        {/* <text textSize="16sp" textColor="black" text="选择第几本开始进行截图"/>
-                        <input id="第几本开始截图" text="1" inputType="number"/>
-                        <text textSize="16sp" textColor="black" text="需要截图的书籍数量"/>
-                        <input id="书籍截图数量" text="1" inputType="number"/> */}
                         <text textSize="16sp" textColor="black" text="是否进行从头开始截图"/>
                         <checkbox id="内容从头开始截图按钮" text="是" checked = "true" marginTop="5"/>
                         
-                        {/* <text textSize="16sp" textColor="black" text="截图完成是否删除书籍"/>
-                        <checkbox id="删除书籍按钮" text="是" checked = "false" marginTop="5"/>
-
-                        <text textSize="16sp" textColor="black" text="书籍离线预下载"/>
-                        <checkbox id="书籍离线预下载按钮" text="是" checked = "false" marginTop="5"/> */}
-                        {/* <text textSize="16sp" textColor="black" text="需要离线下载的书籍数量" /> */}
-                        {/* <input id="离线下载书籍数量" text="10" inputType="number" />  */}
-                                   
-                        {/* <text id="数据保存路径" textSize="16sp" textColor="black" text="当前书籍保存路径:"/> */}
                         
                     </vertical>
                 </ScrollView>
@@ -125,6 +112,29 @@ ui.layout(
     </drawer>
 )
 
+
+//字符串格式化
+String.prototype.format = function(args) {
+    var result = this;
+    if (arguments.length < 1) {
+        return result;
+    }
+    var data = arguments;		//如果模板参数是数组
+    if (arguments.length == 1 && typeof (args) == "object") {
+        //如果模板参数是对象
+        data = args;
+    }
+    for (var key in data) {
+        var value = data[key];
+        if (undefined != value) {
+            result = result.replace("{" + key + "}", value);
+        }
+}
+    return result;
+}
+
+
+
 //设置滑动页面的标题
 ui.viewpager.setTitles(["任务列表", "其他"]);
 //让滑动页面和标签栏联动
@@ -143,23 +153,24 @@ ui.autoService.on("check", function(checked) {
 });
 
 ui.stop.on("click",()=>{
-    // var choiceFile =dialogFile.thelist("/sdcard")
-    // log(choiceFile+"choiceFile")
    // threads.shutDownAll();
    // engines.stopAll();
     exit();
 });
 
 ui.start.on("click",()=>{
-        //程序开始运行之前判断无障碍服务
+    //程序开始运行之前判断无障碍服务
     if (auto.service == null) {
         toastLog("请先开启无障碍服务！");
         return;
     }
-    // form.value书籍截图总页数 = parseInt(ui.书籍截图总页数.getText());
-    // form.value书籍截图数量 = parseInt(ui.书籍截图数量.getText());
-    // form.value第几本开始截图 = parseInt(ui.第几本开始截图.getText());
-  //  form.value书籍离线下载数量 = parseInt(ui.离线下载书籍数量.getText());
+
+    if((!截图应用微信读书按钮Value)&&(!截图应用微信读书Eink按钮Value)){
+        toastLog("未获取到需要截图的微信读书版本，请重新选择")
+        return;
+    }
+        
+
   threads.start(function() {
     main()
   })
@@ -167,7 +178,7 @@ ui.start.on("click",()=>{
 });
 
 //BindSdcard-Init&Save
-var uiStorage = storages.create("STORAGE_UI_VALUE_789185");
+var uiStorage = storages.create("STORAGE_UI_VALUE_7891853");
 ui.emitter.on("resume",()=>{
     log("resume initUiValue")
     initUiValue();
@@ -177,36 +188,40 @@ ui.emitter.on("pause",()=>{
 });
 
 function initUiValue(){
-    ui.图片压缩比.setProgress(uiStorage.get("图片压缩比",0));
-    ui.翻页延时.setProgress(uiStorage.get("翻页延时",0));
-    ui.连续获取书籍数量列表.setSelection(uiStorage.get("连续获取书籍数量",0));
+    ui.图片压缩比.setProgress(uiStorage.get("图片压缩比",图片压缩比Value));
+    ui.翻页延时.setProgress(uiStorage.get("翻页延时",翻页延时时间Value));
+    ui.连续获取书籍数量列表.setSelection(uiStorage.get("连续获取书籍数量",连续获取书籍数量列表Value));
     ui.内容从头开始截图按钮.setChecked(uiStorage.get("内容从头开始截图按钮",false));
     ui.自动获取书籍按钮.setChecked(uiStorage.get("自动获取书籍按钮",false));
-    // ui.获取内容按钮.setChecked(uiStorage.get("获取内容按钮",false));
-    // ui.获取目录按钮.setChecked(uiStorage.get("获取目录按钮",false));
+
     ui.显示想法按钮.setChecked(uiStorage.get("显示想法按钮",false));
     ui.显示截图悬浮按钮.setChecked(uiStorage.get("显示截图悬浮按钮",false));
+
+    ui.书籍目录包含日期按钮.setChecked(uiStorage.get("书籍目录包含日期按钮",false));
     
     ui.微信读书按钮.setChecked(uiStorage.get("微信读书按钮",false));
-    ui.微信读书Eink按钮.setChecked(uiStorage.get("微信读书Eink按钮",false));
+    ui.微信读书Eink按钮.setChecked(uiStorage.get("微信读书Eink按钮",截图应用微信读书Eink按钮Value));
 
 
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
-    // 获取内容按钮Value = ui.获取内容按钮.checked;
-    // 获取目录按钮Value = ui.获取目录按钮.checked;
     显示想法按钮Value = ui.显示想法按钮.checked;
     显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
+
+    书籍目录包含日期按钮Value = ui.书籍目录包含日期按钮.checked;
 
     截图应用微信读书按钮Value =ui.微信读书按钮.checked
     截图应用微信读书Eink按钮Value =ui.微信读书Eink按钮.checked
 
     连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
+
     图片压缩比Value = ui.图片压缩比.getProgress();
     翻页延时时间Value = ui.翻页延时.getProgress();
 
-    ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
-    ui.当前翻页延时显示值.text("当前翻页延时"+翻页延时时间Value*5)
+
+    ui.当前图片压缩比显示值.text("当前图片压缩比:{0}%".format(图片压缩比Value))
+    ui.当前翻页延时显示值.text("当前翻页延时:{0}ms".format(翻页延时时间Value*5))
+
     log("initUiValue...")
 }
 function saveUiValue(){
@@ -215,10 +230,11 @@ function saveUiValue(){
     uiStorage.put("连续获取书籍数量",ui.连续获取书籍数量列表.getSelectedItemPosition());
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
-    // uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
-    // uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
     uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
+
+    uiStorage.put("书籍目录包含日期按钮",ui.书籍目录包含日期按钮.checked);
+
     uiStorage.put("微信读书按钮",ui.微信读书按钮.checked);
     uiStorage.put("微信读书Eink按钮",ui.微信读书Eink按钮.checked);
 
@@ -235,16 +251,6 @@ ui.自动获取书籍按钮.on("check",(checked)=>{
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
 
 });
-// //Bind-Connect 获取内容按钮
-// ui.获取内容按钮.on("check",(checked)=>{
-//     uiStorage.put("获取内容按钮",ui.获取内容按钮.checked);
-//     获取内容按钮Value = ui.获取内容按钮.checked;
-// });
-// //Bind-Connect 获取目录按钮
-// ui.获取目录按钮.on("check",(checked)=>{
-//     uiStorage.put("获取目录按钮",ui.获取目录按钮.checked);
-//     获取目录按钮Value = ui.获取目录按钮.checked;
-// });
 
 ui.显示想法按钮.on("check",(checked)=>{
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
@@ -272,25 +278,28 @@ ui.微信读书Eink按钮.on("check",(checked)=>{
     截图应用微信读书按钮Value = false;
 });
 
+ui.书籍目录包含日期按钮.on("check",(checked)=>{
+    uiStorage.put("书籍目录包含日期按钮",ui.书籍目录包含日期按钮.checked);
+    书籍目录包含日期按钮Value = ui.书籍目录包含日期按钮.checked;
+    log("书籍目录包含日期按钮:"+书籍目录包含日期按钮Value)
+});
 
 
 ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
-    // 测试列表Value = ui.测试列表.getSelectedItemPosition();
     连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
     log("连续获取书籍数量列表Value:"+连续获取书籍数量列表Value)
-   // toastLog(测试列表Value)
 }}));
 
 ui.图片压缩比.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
     图片压缩比Value = ui.图片压缩比.getProgress();
-   // toastLog("比例改变："+图片压缩比Value)
-    ui.当前图片压缩比显示值.text("当前图片压缩比"+图片压缩比Value)
+    ui.当前图片压缩比显示值.text("当前图片压缩比:"+图片压缩比Value)
+    log("图片压缩比Value:"+图片压缩比Value)
 }}));
 
 ui.翻页延时.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
     翻页延时时间Value = ui.翻页延时.getProgress();
-   // toastLog("比例改变："+图片压缩比Value)
-    ui.当前翻页延时显示值.text("当前翻页延时"+翻页延时时间Value*5)
+    ui.当前翻页延时显示值.text("当前翻页延时:"+翻页延时时间Value*5)
+    log("翻页延时时间Value:"+翻页延时时间Value)
 }}));
 
 function main(){
@@ -303,6 +312,7 @@ function main(){
     }
     else{
         var 截图应用 =null
+        toastLog("未获取到需要截图的微信读书版本，请重新选择")
     }
 
     if(内容从头开始截图按钮Value == true){
@@ -315,6 +325,7 @@ function main(){
 
     log("图片压缩比Value的类型:"+typeof(图片压缩比Value))
     log("图片压缩比Value:"+图片压缩比Value)
+
     device.keepScreenOn()
 
     EinkRead.打开微信读书(截图应用)
@@ -337,16 +348,9 @@ function main(){
 
         var 当前书籍名 = EinkRead.打开书籍(choiceBookindex,截图应用)
 
-        
-
         EinkRead.跳转到首页(currentPage,显示想法按钮Value,截图应用)
-
-        // while(1){
-        //     sleep(1000)
-        //     log("暂停")
-        //   }
-        
-        var dirName = EinkRead.获取当前书籍存储路径(当前书籍名)
+ 
+        var dirName = EinkRead.获取当前书籍存储路径(当前书籍名,书籍目录包含日期按钮Value)
     
         EinkRead.打开截图权限()
     
@@ -367,13 +371,6 @@ function main(){
 
 }
 
-
-//toastLog('Hello, Auto.js ' + $app.autojs.versionName);
-
-// var jsonData = readJSON("project.json")
-// writeJSON("data.json",jsonData)
-// log("jsonData.name:"+jsonData.name)
-
 var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
 var jsonUtil = require('jsonUtil.js');
@@ -381,69 +378,3 @@ var dialogFile = require('dialogFile.js');
 
 EinkRead.删除全部其他脚本(engines.myEngine())
 initUiValue();
-
-// threads.start(function() {
-//     var window = floaty.window(
-//         <frame>
-//             <vertical padding="18 8" h="auto">
-//                 <button id="action" text="开始运行" w="90" h="40" bg="#77ffffff"/>
-//                 <button id="action2" text="打开设置界面" w="90" h="40" bg="#77ffffff"/>
-//             </vertical>
-            
-//         </frame>
-//     )
-//     setInterval(() => {}, 1000);
-//     var execution = null;
-    
-//     //记录按键被按下时的触摸坐标
-//     var x = 0,
-//         y = 0;
-//     //记录按键被按下时的悬浮窗位置
-//     var windowX, windowY;
-//     //记录按键被按下的时间以便判断长按等动作
-//     var downTime;
-    
-//     window.action.setOnTouchListener(function(view, event) {
-//         switch (event.getAction()) {
-//             case event.ACTION_DOWN:
-//                 x = event.getRawX();
-//                 y = event.getRawY();
-//                 windowX = window.getX();
-//                 windowY = window.getY();
-//                 downTime = new Date().getTime();
-//                 return true;
-//             case event.ACTION_MOVE:
-//                 //移动手指时调整悬浮窗位置
-//                 window.setPosition(windowX + (event.getRawX() - x),
-//                     windowY + (event.getRawY() - y));
-//                 //如果按下的时间超过1.5秒判断为长按，退出脚本
-//                 if (new Date().getTime() - downTime > 1500) {
-//                     exit();
-//                 }
-//                 return true;
-//             case event.ACTION_UP:
-//                 //手指弹起时如果偏移很小则判断为点击
-//                 if (Math.abs(event.getRawY() - y) < 5 && Math.abs(event.getRawX() - x) < 5) {
-//                     onClick();
-//                 }
-//                 return true;
-//         }
-//         return true;
-//     });
-    
-//     function onClick() {
-//         if (window.action.getText() == '开始运行') {
-//             execution = engines.execScriptFile(path);
-//             window.action.setText('停止运行');
-//         } else {
-//             if (execution) {
-//                 execution.getEngine().forceStop();
-//             }
-//             window.action.setText('开始运行');
-//         }
-//     }
-//     })
-// setTimeout(()=>{
-//     window.close();
-// }, 2000);
-//console.log("baiduocr token:", baiduOCR.Get_token_Res());
