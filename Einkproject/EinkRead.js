@@ -62,8 +62,8 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
 
   }else if(截图应用 == "微信Eink应用"){
     //显示目录页面
-    while(!className("android.widget.TextView").depth(16).id("chapter_page_number").exists()){
-      className("android.widget.TextView").text("目录").depth(14).findOnce().parent().click()
+    while(!className("android.widget.TextView").id("chapter_page_number").exists()){
+      className("android.view.ViewGroup").id("reader_chapter").desc("目录").findOnce().click()
       log("微信读书Eink点击目录按钮")
       sleep(200)
     }
@@ -72,9 +72,6 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
   log("进入微信读书目录页面")
   let allDataList = [];
   let lastPageDataList = [];
-
-
-
 
   if(flag == 1){
     var i =0
@@ -132,7 +129,7 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
         
           
       }else if(截图应用 == "微信Eink应用"){
-        className("androidx.recyclerview.widget.RecyclerView").depth(14).findOnce().children().forEach(function(child1){
+        className("androidx.recyclerview.widget.RecyclerView").depth(2).findOnce().children().forEach(function(child1){
           let dataList = [];
           child1.children().forEach(function(child2,index){
               dataList[index]=child2.text()
@@ -167,7 +164,7 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
         sleep(2000)
 
       }else if(截图应用 == "微信Eink应用"){
-        className("android.view.ViewGroup").id("bottombar_next").depth(13).findOnce().click()
+        className("android.view.ViewGroup").id("bottombar_next").findOnce().click()
         sleep(100)
         if(className("android.widget.TextView").depth(15).text("去顶部").exists()){
           到底部标志++
@@ -278,8 +275,9 @@ EinkRead.打开书籍 = function(choiceBookindex,截图应用){
     className("android.widget.RelativeLayout").depth(5).findOnce(choiceBookindex).click()
   }
   else if(截图应用 == "微信Eink应用"){
-    var 当前书籍名 = className("android.widget.TextView").depth(15).id("book_grid_item_name").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
-    className("android.widget.RelativeLayout").depth(14).findOnce(choiceBookindex).click()
+    var tt = className("android.widget.TextView").id("book_grid_item_name").findOnce(choiceBookindex)
+    var 当前书籍名 =tt.text().replace(/\[icon\]/ig,"");
+    tt.parent().click()
   }
 
   log("已打开书籍，当前书籍名为："+当前书籍名)
@@ -287,7 +285,7 @@ EinkRead.打开书籍 = function(choiceBookindex,截图应用){
 }
 
 EinkRead.设置为已下载模式 = function(){
-  while(!className("android.widget.TextView").depth(14).text("已下载").exists()){
+  while(!className("android.widget.TextView").text("已下载").exists()){
     log("书籍下载未完成")
     sleep(500)
   }
@@ -375,31 +373,26 @@ EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value,截图�
       if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
         log("上滑触发进度按钮")
           //swipe(device.width*3/4,device.height/2,device.width*3/4,device.height*1/4,100)
-
-          gesture(10, [device.width*3/4,device.height/2],[device.width*3/4,device.height*1/4]);
-
-          log("device.width*3/4:"+device.width*3/4)
-          log("device.height/2:"+device.height/2)
-          log("device.width*3/4:"+device.width*3/4)
-          log("device.height*1/4:"+device.height*1/4)
-        //    click(device.width/2, device.height/2)
+        gesture(10, [device.width*3/4,device.height/2],[device.width*3/4,device.height*1/4]);
         sleep(500)
       }
     }
     EinkRead.设置为已下载模式()
 
    
-   while(!className("android.widget.ImageButton").depth(13).id("reader_previous_chapter").exists()){
-       className("android.widget.TextView").text("进度").depth(14).findOnce().parent().click()
+   while(!className("android.widget.ImageButton").id("reader_previous_chapter").exists()){
+      log("进度条不存在，点击地面显示进度条按键")
+       className("android.view.ViewGroup").id("reader_progress").desc("进度").findOnce().click()
        sleep(200)
    }
    log("进入微信读书书本进度条页面")
 
    if(currentPage == 1){
-     swipe((className("android.widget.FrameLayout").depth(14).findOnce().bounds().left+className("android.widget.FrameLayout").depth(14).findOnce().bounds().right)/2, (className("android.widget.FrameLayout").depth(14).findOnce().bounds().top+className("android.widget.FrameLayout").depth(14).findOnce().bounds().bottom)/2, 
-     className("android.widget.FrameLayout").depth(13).id("reader_page_rangebar").findOnce().bounds().left, className("android.widget.FrameLayout").depth(13).id("reader_page_rangebar").findOnce().bounds().top, 100)
-     sleep(200)
-     log("已跳转到书籍首页")
+    while(!className("android.widget.TextView").id("reader_page_info_chapter").text("扉页").exists()){
+      className("android.widget.ImageButton").id("reader_previous_chapter").findOnce().click()
+    }
+    log("已跳转到书籍首页")
+
    }
    click(device.width/2, device.height/2)
   }

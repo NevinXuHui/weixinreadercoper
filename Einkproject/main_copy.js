@@ -30,7 +30,7 @@ var 书籍目录包含日期按钮Value = null
 var 截图应用微信读书按钮Value = null
 var 截图应用微信读书Eink按钮Value = null
 
-var entries = "1|2|3|4|5"
+var entries = "一本书|二本书|三本书|四本书|五本书"
 
 ui.layout(
     <drawer id="drawer">
@@ -69,11 +69,11 @@ ui.layout(
                         <text text="选择截图App" textColor="#222222"/>
                         <radiogroup>
                             <radio id="微信读书按钮" text="微信读书"/>
-                            <radio id="微信读书Eink按钮" text="微信读书Eink" checked = "true"/>
+                            <radio id="微信读书Eink按钮" text="微信读书Eink"/>
                         </radiogroup>
 
                         <text text="连续获取书籍数量" textColor="#222222"/>
-                        <spinner id="连续获取书籍数量列表" entries="{{entries}}"/>
+                        <spinner id="连续获取书籍数量列表" entries="{{entries}}" spinnerMode="dialog"/>
                         <seekbar id="图片压缩比"/>
                         <text text="当前图片压缩比:20%" id="当前图片压缩比显示值" textColor="#222222"/>
                         <seekbar id="翻页延时"/>
@@ -213,7 +213,7 @@ function initUiValue(){
     截图应用微信读书按钮Value =ui.微信读书按钮.checked
     截图应用微信读书Eink按钮Value =ui.微信读书Eink按钮.checked
 
-    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
+    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItemPosition()+1
 
     图片压缩比Value = ui.图片压缩比.getProgress();
     翻页延时时间Value = ui.翻页延时.getProgress();
@@ -244,44 +244,54 @@ function saveUiValue(){
 ui.内容从头开始截图按钮.on("check",(checked)=>{
     uiStorage.put("内容从头开始截图按钮",ui.内容从头开始截图按钮.checked);
     内容从头开始截图按钮Value = ui.内容从头开始截图按钮.checked;
+    log("内容从头开始截图:"+内容从头开始截图按钮Value)
 
 });
 ui.自动获取书籍按钮.on("check",(checked)=>{
     uiStorage.put("自动获取书籍按钮",ui.自动获取书籍按钮.checked);
     自动获取书籍按钮Value = ui.自动获取书籍按钮.checked;
+    log("自动获取书籍:"+自动获取书籍按钮Value)
 
 });
 
 ui.显示想法按钮.on("check",(checked)=>{
     uiStorage.put("显示想法按钮",ui.显示想法按钮.checked);
     显示想法按钮Value = ui.显示想法按钮.checked;
+    log("显示想法:"+显示想法按钮Value)
 });
 
 ui.显示截图悬浮按钮.on("check",(checked)=>{
+
     uiStorage.put("显示截图悬浮按钮",ui.显示截图悬浮按钮.checked);
     显示截图悬浮按钮Value = ui.显示截图悬浮按钮.checked;
+    log("显示截图悬浮:"+显示截图悬浮按钮Value)   
 });
 
 ui.微信读书按钮.on("check",(checked)=>{
-    uiStorage.put("微信读书按钮",ui.微信读书按钮.checked);
-    截图应用微信读书按钮Value = ui.微信读书按钮.checked;
+    if(checked){
+        uiStorage.put("微信读书按钮",ui.微信读书按钮.checked);
+        截图应用微信读书按钮Value = ui.微信读书按钮.checked;
+    
+        uiStorage.put("微信读书Eink按钮",false);
+        截图应用微信读书Eink按钮Value = false;
+    
+        log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
+        log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
+    }
 
-    uiStorage.put("微信读书Eink按钮",false);
-    截图应用微信读书Eink按钮Value = false;
-
-    log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
-    log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
 });
 
 ui.微信读书Eink按钮.on("check",(checked)=>{
-    uiStorage.put("微信读书Eink按钮",ui.微信读书Eink按钮.checked);
-    截图应用微信读书Eink按钮Value = ui.微信读书Eink按钮.checked;
-
-    uiStorage.put("微信读书按钮",false);
-    截图应用微信读书按钮Value = false;
-
-    log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
-    log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
+    if(checked){
+        uiStorage.put("微信读书Eink按钮",ui.微信读书Eink按钮.checked);
+        截图应用微信读书Eink按钮Value = ui.微信读书Eink按钮.checked;
+    
+        uiStorage.put("微信读书按钮",false);
+        截图应用微信读书按钮Value = false;
+    
+        log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
+        log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
+    }
 
 });
 
@@ -293,7 +303,7 @@ ui.书籍目录包含日期按钮.on("check",(checked)=>{
 
 
 ui.连续获取书籍数量列表.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener({onItemSelected : function(parent,view,i,id){
-    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItem();
+    连续获取书籍数量列表Value = ui.连续获取书籍数量列表.getSelectedItemPosition()+1;
     log("连续获取书籍数量列表Value:"+连续获取书籍数量列表Value)
 }}));
 
@@ -306,7 +316,7 @@ ui.图片压缩比.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListene
 ui.翻页延时.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener({onProgressChanged : function(bar,i,isFromUser){
     翻页延时时间Value = ui.翻页延时.getProgress();
     ui.当前翻页延时显示值.text("当前翻页延时:"+翻页延时时间Value*5)
-    log("翻页延时时间Value:"+翻页延时时间Value)
+    log("翻页延时时间Value:"+翻页延时时间Value*5)
 }}));
 
 function main(){
