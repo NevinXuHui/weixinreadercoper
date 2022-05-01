@@ -4,13 +4,13 @@ importClass(android.widget.SeekBar);
 importClass(java.io.File);
 
 // //导入插件
-var ocr2 = $plugins.load("com.hraps.ocr")
+// var ocr2 = $plugins.load("com.hraps.ocr")
 
-// var OCR = $plugins.load('org.autojs.plugin.ocr');
-// var ocr = new OCR();
-// $events.on('exit', () => {
-//     ocr.end();
-// });
+var OCR = $plugins.load('org.autojs.plugin.ocr');
+var ocr = new OCR();
+$events.on('exit', () => {
+    ocr.end();
+});
 
 var 连续获取书籍数量列表Value = 1
 
@@ -28,7 +28,7 @@ var 显示截图悬浮按钮Value = null
 var 书籍目录包含日期按钮Value = null
 
 var 截图应用微信读书按钮Value = null
-var 截图应用微信读书Eink按钮Value = true
+var 截图应用微信读书Eink按钮Value = null
 
 var entries = "1|2|3|4|5"
 
@@ -178,7 +178,7 @@ ui.start.on("click",()=>{
 });
 
 //BindSdcard-Init&Save
-var uiStorage = storages.create("STORAGE_UI_VALUE_789185936");
+var uiStorage = storages.create("STORAGE_UI_VALUE_7891859369");
 ui.emitter.on("resume",()=>{
     log("resume initUiValue")
     initUiValue();
@@ -268,6 +268,9 @@ ui.微信读书按钮.on("check",(checked)=>{
 
     uiStorage.put("微信读书Eink按钮",false);
     截图应用微信读书Eink按钮Value = false;
+
+    log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
+    log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
 });
 
 ui.微信读书Eink按钮.on("check",(checked)=>{
@@ -276,6 +279,10 @@ ui.微信读书Eink按钮.on("check",(checked)=>{
 
     uiStorage.put("微信读书按钮",false);
     截图应用微信读书按钮Value = false;
+
+    log("截图应用微信读书按钮Value:"+截图应用微信读书按钮Value)
+    log("截图应用微信读书Eink按钮Value:"+截图应用微信读书Eink按钮Value)
+
 });
 
 ui.书籍目录包含日期按钮.on("check",(checked)=>{
@@ -362,7 +369,6 @@ function main(){
         EinkRead.进入书架界面()
 
     }
-
 
     toastLog("截图完成退出")
     device.cancelKeepingAwake()
