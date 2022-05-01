@@ -12,46 +12,132 @@ EinkRead.向后翻页 = function() {
 }
 
 
-EinkRead.获取目录 = function(dirName,flag){
+EinkRead.获取目录 = function(dirName,flag,截图应用){
   var currentDirContent = dirName + "目录";
   //创建目录文件
   files.createWithDirs(currentDirContent);
   var 目录文件 = open(currentDirContent, "w");
+  log("创建目录文件完成")
 
   //显示底下框
-  while(!className("android.widget.TextView").text("目录").exists()){
+
+  if(截图应用 == "微信应用"){
+    while(!className("android.widget.ImageView").desc("目录").exists()){
+      log("当前包名111："+currentPackage())
+      log("当前活动1111："+currentActivity())
+      if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
+        gesture(10, [device.width*3/4,device.height/2],[device.width*3/4,device.height*1/4]);
+        log("触发上滑寻找获取目录按钮")
+          // click(device.width/2, device.height/2)
+          sleep(200)
+      }
+    }
+  }else if(截图应用 == "微信Eink应用"){
+    while(!className("android.widget.TextView").text("目录").exists()){
       log("当前包名111："+currentPackage())
       log("当前活动1111："+currentActivity())
       if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
           click(device.width/2, device.height/2)
           sleep(200)
       }
+    }
   }
-  log("显示目录按钮")
 
-  //显示目录页面
-  while(!className("android.widget.TextView").depth(16).id("chapter_page_number").exists()){
-      className("android.widget.TextView").text("目录").depth(14).findOnce().parent().click()
-      log("点击目录按钮")
+  log("已找到目录按钮")
+
+
+  // if(截图应用 == "微信应用"){
+
+  // }else if(截图应用 == "微信Eink应用"){
+    
+  // }
+
+  if(截图应用 == "微信应用"){
+    //显示目录页面
+    while(!className("android.widget.TextView").depth(20).id("chapter_page_number").exists()){
+      className("android.widget.ImageView").desc("目录").depth(13).findOnce().click()
+      log("微信读书点击目录按钮")
       sleep(200)
+    }
+
+  }else if(截图应用 == "微信Eink应用"){
+    //显示目录页面
+    while(!className("android.widget.TextView").depth(16).id("chapter_page_number").exists()){
+      className("android.widget.TextView").text("目录").depth(14).findOnce().parent().click()
+      log("微信读书Eink点击目录按钮")
+      sleep(200)
+    }
   }
+
   log("进入微信读书目录页面")
   let allDataList = [];
   let lastPageDataList = [];
 
-  if(flag == 1){
 
-      if(className("android.widget.TextView").text("去顶部").exists()){
-          className("android.widget.TextView").text("去顶部").findOnce().parent().click()
-          log("点击去顶部")
-          sleep(500)
+
+
+  if(flag == 1){
+    var i =0
+    if(截图应用 == "微信应用"){
+      while(!className("android.widget.TextView").text("扉页").exists()){
+
+        className("androidx.recyclerview.widget.RecyclerView").depth(18).findOnce().scrollBackward()
+        log("上滑")
       }
       log("回到顶部")
+      
+    }else if(截图应用 == "微信Eink应用"){
+      if(className("android.widget.TextView").text("去顶部").exists()){
+        className("android.widget.TextView").text("去顶部").findOnce().parent().click()
+        log("点击去顶部Eink")
+        sleep(500)
+      }
+      log("回到顶部Eink")
+    }      
   }
+
   var 到底部标志 = 0
   while(到底部标志<2){
       let pageDataList = [];
-      className("androidx.recyclerview.widget.RecyclerView").depth(14).findOnce().children().forEach(function(child1){
+
+      if(截图应用 == "微信应用"){
+        let dataList = [];
+        var t = className("androidx.recyclerview.widget.RecyclerView").depth(18).findOnce().children()
+        if(t!=null){
+          t.forEach(function(child1){
+            if(child1!=null){
+              var tt= child1.children()
+              if(tt!=null){
+                tt.forEach(function(child2,index){
+                  if(child2!=null){
+                    //log("child2:"+child2)
+                    if(child2.className()=="android.widget.TextView"){
+                      dataList[index]=child2.text()
+                    }
+                  }
+                })
+              }
+            }
+            
+          })
+        }
+        
+          
+          let 目录重复标志 = 0
+          lastPageDataList.forEach(function(item, index){
+              if(lastPageDataList[index][1] == dataList[1]){
+                  目录重复标志 = 1
+              }
+          })
+          if(目录重复标志 == 0){
+              pageDataList.push(dataList)
+              log("加入一行目录："+dataList)
+
+          }
+          log("dataList:"+dataList)
+          
+      }else if(截图应用 == "微信Eink应用"){
+        className("androidx.recyclerview.widget.RecyclerView").depth(14).findOnce().children().forEach(function(child1){
           let dataList = [];
           child1.children().forEach(function(child2,index){
               dataList[index]=child2.text()
@@ -70,15 +156,27 @@ EinkRead.获取目录 = function(dirName,flag){
           log(dataList)
           
       })
+      }
+
       lastPageDataList = pageDataList
       pageDataList.forEach(function(item) {
           目录文件.writeline(item);
       });
-      className("android.view.ViewGroup").id("bottombar_next").depth(13).findOnce().click()
-      sleep(100)
-      if(className("android.widget.TextView").depth(15).text("去顶部").exists()){
+
+      if(截图应用 == "微信应用"){
+        className("androidx.recyclerview.widget.RecyclerView").depth(18).findOnce().scrollForward()
+        log("下滑")
+        sleep(800)
+
+      }else if(截图应用 == "微信Eink应用"){
+        className("android.view.ViewGroup").id("bottombar_next").depth(13).findOnce().click()
+        sleep(100)
+        if(className("android.widget.TextView").depth(15).text("去顶部").exists()){
           到底部标志++
+        }
       }
+ 
+      
   }
   //log("pageDataList:"+pageDataList)
   
@@ -174,7 +272,7 @@ EinkRead.进入书架界面 = function(截图应用){
 EinkRead.打开书籍 = function(choiceBookindex,截图应用){
 
   if(截图应用 == "微信应用"){
-    var 当前书籍名 = className("android.widget.TextView").depth(22).id("ho").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
+    var 当前书籍名 = className("android.widget.TextView").depth(22).id("book_grid_item_name").findOnce(choiceBookindex).text().replace(/\[icon\]/ig,"");
     className("android.widget.RelativeLayout").depth(21).findOnce(choiceBookindex).click()
   }
   else if(截图应用 == "微信Eink应用"){
@@ -231,22 +329,24 @@ EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value,截图�
   
   log("开始准备跳转到首页")
   if(截图应用 == "微信应用"){
-    while(!className("android.widget.ImageView").id("yo").desc("进度").exists()){
+    while(!className("android.widget.ImageView").id("reader_progress").desc("进度").exists()){
       log("不存在进度按钮")
         log("当前包名："+currentPackage())
         log("当前活动："+currentActivity())
         if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
-          log("触发进度按钮")
+          
+          gesture(10, [device.width*3/4,device.height/2],[device.width*3/4,device.height*1/4]);
+          log("已触发进度按钮")
            // swipe(device.width/2, device.height/2,device.width/2,device.height*3/8,50)
-            click(device.width/2, device.height/2)
+            // click(device.width/2, device.height/2)
             sleep(500)
         }
     }
     // EinkRead.设置为已下载模式()
     // EinkRead.显示想法设置(显示想法按钮Value)
    
-    while(!className("android.widget.ImageButton").depth(12).id("a04").exists()){
-       className("android.widget.ImageView").id("yo").desc("进度").findOnce().click()
+    while(!className("android.widget.ImageButton").depth(12).id("reader_previous_chapter").exists()){
+       className("android.widget.ImageView").id("reader_progress").desc("进度").findOnce().click()
        sleep(200)
    }
    log("进入微信读书书本进度条页面")
@@ -254,7 +354,7 @@ EinkRead.跳转到首页 = function(currentPage,显示想法按钮Value,截图�
 
    if(currentPage == 1){
      var target = className("android.widget.FrameLayout").depth(13).findOnce()
-     var target2 = className("android.widget.FrameLayout").id("a08").depth(12).findOnce()
+     var target2 = className("android.widget.FrameLayout").id("reader_page_rangebar").depth(12).findOnce()
 
      swipe((target.bounds().left+target.bounds().right)/2, (target.bounds().top+target.bounds().bottom)/2, 
      target2.bounds().left, target2.bounds().top, 100)
@@ -453,8 +553,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
                       EinkRead.保存一页图片(dirName,imgType,currentPage,img,图片压缩比Value)
                       
-                      
-                      EinkRead.获取目录(dirName,1)
+                      log("开始获取目录-2")
+                      EinkRead.获取目录(dirName,1,截图应用)
                       log("获取了全书完文字后获取目录成功")
                       log("获取目录后ocrcurrentPage:"+ocrcurrentPage)
                       log("获取目录后ocrendPage:"+ocrendPage)
@@ -467,7 +567,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
 
                     }else if(ocrcurrentPage == ocrendPage ){
                       if(currentPage == ocrcurrentPage){
-                        EinkRead.获取目录(dirName,1)
+                        log("开始获取目录-1")
+                        EinkRead.获取目录(dirName,1,截图应用)
                         log("截图ocr匹配获取目录成功")
                       }
                     }

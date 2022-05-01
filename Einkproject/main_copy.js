@@ -3,13 +3,14 @@ importClass(android.widget.AdapterView);
 importClass(android.widget.SeekBar);
 importClass(java.io.File);
 
-//导入插件
-//var ocr = $plugins.load("com.hraps.ocr")
-var OCR = $plugins.load('org.autojs.plugin.ocr');
-var ocr = new OCR();
-$events.on('exit', () => {
-    ocr.end();
-});
+// //导入插件
+var ocr2 = $plugins.load("com.hraps.ocr")
+
+// var OCR = $plugins.load('org.autojs.plugin.ocr');
+// var ocr = new OCR();
+// $events.on('exit', () => {
+//     ocr.end();
+// });
 
 var 连续获取书籍数量列表Value = 1
 
@@ -112,7 +113,6 @@ ui.layout(
     </drawer>
 )
 
-
 //字符串格式化
 String.prototype.format = function(args) {
     var result = this;
@@ -178,7 +178,7 @@ ui.start.on("click",()=>{
 });
 
 //BindSdcard-Init&Save
-var uiStorage = storages.create("STORAGE_UI_VALUE_7891853");
+var uiStorage = storages.create("STORAGE_UI_VALUE_789185936");
 ui.emitter.on("resume",()=>{
     log("resume initUiValue")
     initUiValue();
@@ -370,6 +370,7 @@ function main(){
     engines.stopAll();
 
 }
+
 
 var EinkRead = require('EinkRead.js');
 var baiduOCR = require('baiduOCR.js');
