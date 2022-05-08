@@ -376,7 +376,7 @@ function main(){
         EinkRead.截整本书(tokenRes,dirName,currentPage,baiduOCR,图片压缩比Value,ocr,翻页延时时间Value,截图应用)
 
         choiceBookindex++
-        EinkRead.进入书架界面()
+        EinkRead.进入书架界面(截图应用)
 
     }
 

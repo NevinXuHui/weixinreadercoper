@@ -132,7 +132,11 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
         className("androidx.recyclerview.widget.RecyclerView").depth(2).findOnce().children().forEach(function(child1){
           let dataList = [];
           child1.children().forEach(function(child2,index){
+            log("child2:"+child2)
+            if(child2 != null){
               dataList[index]=child2.text()
+            }
+              
           })
           let 目录重复标志 = 0
           lastPageDataList.forEach(function(item, index){
@@ -141,11 +145,10 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
               }
           })
           if(目录重复标志 == 0){
-              pageDataList.push(dataList)
-
+            pageNewDataList.push(dataList)
+            log("不重复的dataList:"+dataList)
           }
-          log("dataList:")
-          log(dataList)
+          pageDataList.push(dataList)
           
       })
       }
@@ -153,6 +156,7 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
       lastPageDataList = pageDataList
       pageNewDataList.forEach(function(item) {
           目录文件.writeline(item);
+          log("写了一行目录："+item)
       });
 
       if(截图应用 == "微信应用"){
@@ -166,14 +170,12 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
       }else if(截图应用 == "微信Eink应用"){
         className("android.view.ViewGroup").id("bottombar_next").findOnce().click()
         sleep(100)
-        if(className("android.widget.TextView").depth(15).text("去顶部").exists()){
+        if(className("android.widget.TextView").text("去顶部").exists()){
           到底部标志++
+          log("到底部了呢")
         }
       }
- 
-      
   }
-  //log("pageDataList:"+pageDataList)
   
   目录文件.close();
   log("目录获取完成")
@@ -183,8 +185,8 @@ EinkRead.获取目录 = function(dirName,flag,截图应用){
     log("微信读书点击目录按钮")
 
   }else if(截图应用 == "微信Eink应用"){
-    click(className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().left,className("android.widget.TextView").text("目录").depth(14).findOnce().bounds().top)
-    log("任意位置按键退出目录")
+    click(className("android.view.ViewGroup").id("reader_chapter").desc("目录").findOnce().bounds().centerX(),className("android.view.ViewGroup").id("reader_chapter").desc("目录").findOnce().bounds().centerY())
+    log("微信读书点击目录按钮2")
   }
 
   sleep(200)
@@ -230,13 +232,15 @@ EinkRead.打开微信读书 = function(截图应用){
 
 EinkRead.进入书架界面 = function(截图应用){
   log("准备进入微信读书书架界面")
+
   while(!className("android.widget.TextView").text("书架").exists()){
       log("不在微信读书主界面")
       log("当前包名："+currentPackage())
       log("当前活动："+currentActivity())
       if("com.tencent.weread.ReaderFragmentActivity"==currentActivity()){
-          swipe(device.width/2, device.height/2,device.width/2,device.height/10,10)
-          sleep(200)
+        log("上滑手势操作一次")
+        swipe(device.width/2, device.height/2,device.width/2,device.height/10,10)
+        sleep(200)
       }
 
       if(截图应用 == "微信应用"){
@@ -246,7 +250,9 @@ EinkRead.进入书架界面 = function(截图应用){
         }
       }
       else if(截图应用 == "微信Eink应用"){
+        log("将到按返回键")
         if(className("android.widget.TextView").text("返回").exists()){
+          log("找到返回键")
           className("android.widget.TextView").text("返回").findOnce().parent().click()
           log("返回")
         }
@@ -276,7 +282,7 @@ EinkRead.打开书籍 = function(choiceBookindex,截图应用){
   }
   else if(截图应用 == "微信Eink应用"){
     var tt = className("android.widget.TextView").id("book_grid_item_name").findOnce(choiceBookindex)
-    var 当前书籍名 =tt.text().replace(/\[icon\]/ig,"");
+    var 当前书籍名 =tt.text().replace(/\[icon\]/ig,"")+"eink";
     tt.parent().click()
   }
 
@@ -484,8 +490,8 @@ EinkRead.截整本书 = function(tokenRes,dirName,currentPage,baiduOCR,图片压
       var target2 = className("android.widget.TextView").depth(12).id("text_first_line_view").exists()
     }
     else if(截图应用 == "微信Eink应用"){
-      var target1 = className("android.view.ViewGroup").depth(13).desc("字体").id("reader_font").exists()
-      var target2 = className("android.widget.TextView").depth(12).id("text_first_line_view").exists()
+      var target1 = className("android.view.ViewGroup").desc("字体").id("reader_font").exists()
+      var target2 = className("android.widget.TextView").id("text_first_line_view").exists()
     }
 
       if(!target1){
