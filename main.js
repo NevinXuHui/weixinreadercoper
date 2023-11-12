@@ -17,7 +17,7 @@ if (runningEngines.length > 1) {
 var window = floaty.window(
   <frame gravity="center">
     <vertical>
-      <text id="text" textSize="16sp" textColor="#3b17dbff" />
+      <text id="text" textSize="16sp" textColor="#e61414" />
       <button id="captureAndOcr" text="截图识别" />
       <button id="closeBtn" text="退出" />
     </vertical>
@@ -35,9 +35,8 @@ window.captureAndOcr.click(function () {
   ocrstart = 1;
 });
 
-
 window.exitOnClose();
-恢复悬浮窗初始状态()
+恢复悬浮窗初始状态();
 
 window.text.click(() => {
   window.setAdjustEnabled(!window.isAdjustEnabled());
@@ -51,9 +50,9 @@ setInterval(() => {
 }, 1000);
 
 setInterval(function () {
-    // toastLog("1s刷新", "forcible");
+  // toastLog("1s刷新", "forcible");
   if (ocrstart == 1) {
-  // toastLog("开始识别 ocr", "forcible");
+    // toastLog("开始识别 ocr", "forcible");
     ocrfuction();
   }
 }, 1000);
@@ -69,7 +68,9 @@ function dynamicText() {
   str += util.format("内存使用量: %d%%\n", getMemoryUsage());
   str += "当前活动: " + currentActivity() + "\n";
   str += "当前包名: " + currentPackage() + "\n";
-  if (!(bookname === null)) str += "bookname: " + bookname + "\n";
+  if (!(bookname === null)) {
+    str += "bookname: " + bookname + "\n";
+  }
 
   if (ocrresult.length > 0) {
     str += "ocrresult:" + ocrresult[ocrresult.length - 1];
@@ -89,6 +90,20 @@ toastLog(ocr.mode);
 var bookname = null;
 var ocrresult = [];
 
+// console
+//   .build({
+//     size: [0.8, 0.6],
+//     position: [0.1, 0.15],
+//     title: "HELLO WORLD",
+//     titleTextSize: 18,
+//     contentTextSize: 16,
+//     backgroundColor: "deep-orange-900",
+//     titleBackgroundAlpha: 0.8,
+//     contentBackgroundAlpha: 0.5,
+//     exitOnClose: 6e3,
+//   })
+//   .show();
+
 function 恢复悬浮窗初始状态() {
   bookname = null;
   ocrresult = [];
@@ -99,6 +114,9 @@ function 恢复悬浮窗初始状态() {
 
 function 微信读书页存在其他控件() {
   if (text("上滑显示工具栏").exists()) {
+    return 1;
+  }
+  if (textContains("返回原进度").exists()) {
     return 1;
   }
   return 0;
@@ -132,7 +150,11 @@ function ocrfuction() {
       if (id("reader_top_more").exists()) {
         id("reader_top_more").findOnce().click();
         sleep(300);
-        bookname = className("TextView").depth(5).findOnce().text();
+        if (className("TextView").depth(5).exists()) {
+          bookname = className("TextView").depth(5).findOnce().text();
+        } else if (className("TextView").depth(4).exists()) {
+          bookname = className("TextView").depth(4).findOnce().text();
+        }
         setScreenMetrics(1080, 1920);
         swipe(540, 960, 540, 1900, 30);
       } else {
