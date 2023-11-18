@@ -17,8 +17,10 @@ if (runningEngines.length > 1) {
 var window = floaty.window(
   <frame gravity="center">
     <vertical>
-      <text id="text" textSize="16sp" textColor="#e61414" />
-      <button id="captureAndOcr" text="截图识别" />
+      {/* <text id="text" textSize="16sp" textColor="#e61414" /> */}
+      <button id="captureAndOcr" text="半自动截图识别" />
+      <button id="autocaptureAndOcr" text="自动截图识别" />
+      <button id="storeToc" text="保存目录" />
       <button id="closeBtn" text="退出" />
     </vertical>
   </frame>
@@ -35,22 +37,44 @@ window.captureAndOcr.click(function () {
   ocrstart = 1;
 });
 
+window.autocaptureAndOcr.click(function () {
+  // toastLog("开始识别", "forcible");
+  ocrstart = 2;
+});
+
+//启用按键监听
+events.observeKey();
+//监听音量上键按下
+events.onKeyDown("volume_up", function(event) {
+    toast("音量上键被按下了,暂停截图");
+  // sleep(1000);
+  ocrstart =0
+      恢复悬浮窗初始状态();
+    // exit();
+
+});
+
 window.exitOnClose();
 恢复悬浮窗初始状态();
 
-window.text.click(() => {
-  window.setAdjustEnabled(!window.isAdjustEnabled());
-});
+// window.text.click(() => {
+//   window.setAdjustEnabled(!window.isAdjustEnabled());
+// });
 
 setInterval(() => {
   //对控件的操作需要在UI线程中执行
   ui.run(function () {
-    window.text.setText(dynamicText());
+    // window.text.setText(dynamicText());
   });
 }, 1000);
 
 setInterval(function () {
   // toastLog("1s刷新", "forcible");
+  if (ocrstart == 2)
+  {
+    ocrstart = 1
+    打开微信()
+  }
   if (ocrstart == 1) {
     // toastLog("开始识别 ocr", "forcible");
     ocrfuction();
@@ -104,6 +128,11 @@ var ocrresult = [];
 //   })
 //   .show();
 
+function 打开微信() {
+  app.launch("com.tencent.weread")
+ }
+
+
 function 恢复悬浮窗初始状态() {
   bookname = null;
   ocrresult = [];
@@ -114,12 +143,28 @@ function 恢复悬浮窗初始状态() {
 
 function 微信读书页存在其他控件() {
   if (text("上滑显示工具栏").exists()) {
+    log("存在上滑工具栏按钮")
     return 1;
   }
   if (textContains("返回原进度").exists()) {
+    log("存在返回原进度按钮")
+    return 1;
+  }
+  if (textContains("你正在使用付费会员卡").exists()) {
+    log("存在正在使用付费会员卡按钮")
+    return 1;
+  }
+  return 微信读书页面需要重新下载()
+}
+
+function 微信读书页面需要重新下载() {
+  if (className("android.widget.Button").clickable().text("重新下载").exists()) {  
+    log("存在重新下载按钮")
+    id("empty_view_button").findOnce().click();
     return 1;
   }
   return 0;
+
 }
 
 function 悬浮窗口消失() {
@@ -144,9 +189,10 @@ function 向左滑动() {
   swipe(960, 960, 200, 960, 100);
 }
 
-function ocrfuction() {
-  if (packageName("com.tencent.weread").id("pull_description").exists()) {
-    if (bookname === null) {
+
+function 获取书籍名称()
+{
+  if (bookname === null) {
       if (id("reader_top_more").exists()) {
         id("reader_top_more").findOnce().click();
         sleep(300);
@@ -161,7 +207,13 @@ function ocrfuction() {
         setScreenMetrics(1080, 1920);
         swipe(540, 960, 540, 100, 100);
       }
-    } else {
+    }
+}
+
+function ocrfuction() {
+  if (packageName("com.tencent.weread").id("pull_description").exists()) {
+    获取书籍名称()
+    if (bookname !== null)  {
       if (id("reader_top_more").exists()) {
         setScreenMetrics(1080, 1920);
         click(540, 960);
@@ -179,3 +231,107 @@ function ocrfuction() {
     恢复悬浮窗初始状态();
   }
 }
+
+function 保存目录() {
+    var currentDirContent = dir + "/目录.txt";
+    toastLog("test5");
+    var num = 0;
+    files.createWithDirs(currentDirContent);
+    var 目录文件 = open(currentDirContent, "w");
+    var ret = className("android.widget.ImageView").id("yn").desc("目录").findOnce();
+    while (!ret) {
+        ret = className("android.widget.ImageView").id("yn").desc("目录").findOnce();
+        num++;
+        if ((num % 10) == 0) {
+            gesture(200, [width / 2, height - 500], [width / 2, 1000]); //上滑
+            toastLog("正在寻找目录按键");
+        }
+        sleep(100);
+    }
+    ret.click();
+toastLog("test6");
+
+    while (!className("android.widget.TextView").text("扉页").exists()) {
+        
+        ret = className("androidx.recyclerview.widget.RecyclerView").findOnce();
+        ret.scrollBackward();
+    }
+    log("到达目录最上头");
+    var lastPageDataList = [];
+    while (1) {
+        var ret = className("androidx.recyclerview.widget.RecyclerView").findOnce();
+        //toastLog(ret);
+        while (!ret) {
+            ret = className("androidx.recyclerview.widget.RecyclerView").findOnce();
+            toastLog("正在寻找目录内容框架");
+            sleep(3000);
+        }
+        var pageDataList = [];
+        var allPageDataList = [];
+        log("初始pageDataList长度:" + pageDataList.length);
+        var 终极重复标志 = 0;
+        //获取一页目录内容
+        ret.children().forEach(function(ll) {
+            var dataList = [];
+            var 目录重复标志 = 0;
+            var i = 0;
+            //获取单个目录内容
+            ll.children().forEach(function(tv) {
+                dataList[i] = tv.text();
+                i++;
+            });
+            //当前某一行与上一个列表中的任何项比较
+            lastPageDataList.forEach(function(item, index) {
+                if (lastPageDataList[index][1] == dataList[1]) {
+                    //  log("lastPageDataList:"+lastPageDataList);
+                    // log("发现重复目录");
+                    // //  log("index"+index);
+                    log("dataList:" + dataList);
+                    目录重复标志 = 1;
+                } else {
+                    log("未发现重复目录");
+                    log("lastPageDataList:" + lastPageDataList);
+                    log("dataList:" + dataList);
+                }
+                //  log("index:"+index);
+                //  log("item:"+item);
+                //  log("lastPageDataList[index][1]:"+lastPageDataList[index][1]);
+                //  log("dataList[1]:"+dataList[1]);
+            });
+            //无重复的写入当前列表中
+            if (目录重复标志 == 0) {
+                log("dataList的值：" + dataList);
+                pageDataList.push(dataList);
+            }
+            allPageDataList.push(dataList);
+            // log("dataList[1]:"+dataList[1]);
+        });
+        // log("lastPageDataList[0]:"+lastPageDataList[0]);
+        // log("pageDataList[0]:"+pageDataList[0]);
+        // if(lastPageDataList[0][1] == pageDataList[0][1]){
+        //     目录文件.close();
+        //     break;
+        // }
+        log("pageDataList.length:" + pageDataList.length);
+        if (pageDataList.length == 0) {
+            log("目录重复了");
+            目录文件.close();
+            break;
+        }
+        //更新当前最新目录到上一次的目录
+        lastPageDataList = allPageDataList;
+        //   log(pageDataList);
+        pageDataList.forEach(function(item, index) {
+            目录文件.writeline(item);
+        });
+        // if(终极重复标志 == 1){
+        //     目录文件.close();
+        //     break;
+        // }
+        ret.scrollForward();
+        log("翻页一次");
+        sleep(800);
+    }
+}
+
+
